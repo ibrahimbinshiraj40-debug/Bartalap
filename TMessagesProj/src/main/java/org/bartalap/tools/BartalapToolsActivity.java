@@ -69,6 +69,7 @@ public class BartalapToolsActivity extends BaseFragment {
     public static final int MODE_LINKS = 7;
     public static final int MODE_KEYWORDS = 8;
     public static final int MODE_YOUTUBE = 9;
+    public static final int MODE_BEST_TIME = 10;
 
     private static final String PREFS = "bartalap_tools";
     private static final String KEY_TEMPLATES = "quick_replies";
@@ -264,6 +265,7 @@ public class BartalapToolsActivity extends BaseFragment {
             case MODE_LINKS: return "লিংক ভল্ট";
             case MODE_KEYWORDS: return "অফার / কীওয়ার্ড খুঁজুন";
             case MODE_YOUTUBE: return "YouTube অটো পোস্ট";
+            case MODE_BEST_TIME: return "পোস্ট করার সেরা সময়";
             default: return "Bartalap Tools";
         }
     }
@@ -280,6 +282,7 @@ public class BartalapToolsActivity extends BaseFragment {
             case MODE_LINKS: buildLinks(ctx); break;
             case MODE_KEYWORDS: buildKeywords(ctx); break;
             case MODE_YOUTUBE: buildYouTube(ctx); break;
+            case MODE_BEST_TIME: buildBestTime(ctx); break;
             default: buildHome(ctx); break;
         }
     }
@@ -316,6 +319,8 @@ public class BartalapToolsActivity extends BaseFragment {
                 v -> presentFragment(new BartalapToolsActivity(MODE_INBOX)), null));
         content.addView(itemCard(ctx, "▶️ YouTube অটো পোস্ট", "আপনার YouTube চ্যানেলে নতুন ভিডিও এলে নিজে থেকে Telegram চ্যানেলে পোস্ট হবে",
                 v -> presentFragment(new BartalapToolsActivity(MODE_YOUTUBE)), null));
+        content.addView(itemCard(ctx, "📊 পোস্ট করার সেরা সময়", "আপনার Telegram চ্যানেলে কোন সময় আর কোন দিন পোস্ট করলে বেশি ভিউ আসে",
+                v -> presentFragment(new BartalapToolsActivity(MODE_BEST_TIME)), null));
         content.addView(itemCard(ctx, "🔗 লিংক ভল্ট", "সব চ্যাটে আসা লিংক এক জায়গায়: YouTube, Drive, Facebook, Telegram",
                 v -> presentFragment(new BartalapToolsActivity(MODE_LINKS)), null));
         content.addView(itemCard(ctx, "🔔 অফার / কীওয়ার্ড খুঁজুন", "সব চ্যানেল আর গ্রুপে \"ChatGPT Plus\", \"Canva\" এর মতো শব্দ খুঁজুন",
@@ -998,6 +1003,19 @@ public class BartalapToolsActivity extends BaseFragment {
                         }));
             }
         }
+        boolean alertOn = KeywordAlertWorker.isEnabled();
+        View alertCard = itemCard(ctx, "🔔 নতুন পোস্টে নোটিফিকেশন: " + (alertOn ? "চালু ✅" : "বন্ধ"),
+                "সেভ করা শব্দগুলো নিয়ে কেউ নতুন পোস্ট দিলে প্রতি ৩০ মিনিটে চেক করে নোটিফিকেশন দেবে। চাপ দিয়ে চালু/বন্ধ করুন",
+                v -> {
+                    if (!KeywordAlertWorker.isEnabled() && loadArray(KEY_KEYWORDS).length() == 0) {
+                        toast("আগে অন্তত একটা শব্দ সেভ করুন");
+                        return;
+                    }
+                    KeywordAlertWorker.setEnabled(!KeywordAlertWorker.isEnabled());
+                    toast(KeywordAlertWorker.isEnabled() ? "নোটিফিকেশন চালু ✅" : "নোটিফিকেশন বন্ধ");
+                    build(ctx);
+                }, null);
+        content.addView(alertCard);
         results.setLayoutParams(lp(12));
         content.addView(results);
     }
@@ -1175,6 +1193,136 @@ public class BartalapToolsActivity extends BaseFragment {
             build(ctx);
         });
         showDialog(b.create());
+    }
+
+
+    // ---------------------------------------------------------------- best time to post
+
+    private void buildBestTime(Context ctx) {
+        TextView intro = text(ctx, "আপনার চ্যানেলের শেষ ১০০টা পোস্টের ভিউ দেখে বের করবে কোন সময়ে পোস্ট করলে বেশি ভিউ আসে।", 14, false, grayColor());
+        intro.setLayoutParams(lp(8));
+        content.addView(intro);
+        Button pick = button(ctx, "📢 চ্যানেল বেছে নিন", v -> pickChannelForStats(ctx));
+        pick.setLayoutParams(lp(12));
+        content.addView(pick);
+        statsBox = new LinearLayout(ctx);
+        statsBox.setOrientation(LinearLayout.VERTICAL);
+        statsBox.setLayoutParams(lp(12));
+        content.addView(statsBox);
+    }
+
+    private LinearLayout statsBox;
+
+    private void pickChannelForStats(Context ctx) {
+        if (getParentActivity() == null) return;
+        MessagesController mc = MessagesController.getInstance(currentAccount);
+        ArrayList<Long> ids = new ArrayList<>();
+        ArrayList<CharSequence> names = new ArrayList<>();
+        for (TLRPC.Dialog d : new ArrayList<>(mc.getAllDialogs())) {
+            if (d == null || !DialogObject.isChatDialog(d.id)) continue;
+            TLRPC.Chat c = mc.getChat(-d.id);
+            if (c == null || !ChatObject.isChannelAndNotMegaGroup(c)) continue;
+            ids.add(d.id);
+            names.add("📢 " + c.title);
+        }
+        if (ids.isEmpty()) {
+            toast("কোনো চ্যানেল পাওয়া যায়নি");
+            return;
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
+        b.setTitle("কোন চ্যানেল?");
+        b.setItems(names.toArray(new CharSequence[0]), (dlg, which) -> loadChannelStats(ctx, ids.get(which), names.get(which).toString()));
+        showDialog(b.create());
+    }
+
+    private static final String[] WEEKDAYS = {"রবিবার", "সোমবার", "মঙ্গলবার", "বুধবার", "বৃহস্পতিবার", "শুক্রবার", "শনিবার"};
+
+    private static String hourLabel(int h) {
+        String part = h < 5 ? "রাত" : h < 12 ? "সকাল" : h < 15 ? "দুপুর" : h < 18 ? "বিকাল" : h < 20 ? "সন্ধ্যা" : "রাত";
+        int h12 = h % 12 == 0 ? 12 : h % 12;
+        return part + " " + h12 + "টা";
+    }
+
+    private void loadChannelStats(Context ctx, long dialogId, String name) {
+        statsBox.removeAllViews();
+        statsBox.addView(emptyText(ctx, name + " এর পোস্ট দেখা হচ্ছে… ⏳"));
+        TLRPC.TL_messages_getHistory req = new TLRPC.TL_messages_getHistory();
+        req.peer = MessagesController.getInstance(currentAccount).getInputPeer(dialogId);
+        req.limit = 100;
+        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+            statsBox.removeAllViews();
+            if (!(response instanceof TLRPC.messages_Messages)) {
+                statsBox.addView(emptyText(ctx, "পোস্ট লোড করা যায়নি।"));
+                return;
+            }
+            TLRPC.messages_Messages res = (TLRPC.messages_Messages) response;
+            long[] hourViews = new long[24];
+            int[] hourCount = new int[24];
+            long[] dayViews = new long[7];
+            int[] dayCount = new int[7];
+            int posts = 0;
+            long total = 0;
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            for (TLRPC.Message m : res.messages) {
+                if (m == null || m.views <= 0) continue;
+                cal.setTimeInMillis(m.date * 1000L);
+                int h = cal.get(java.util.Calendar.HOUR_OF_DAY);
+                int dw = cal.get(java.util.Calendar.DAY_OF_WEEK) - 1;
+                hourViews[h] += m.views;
+                hourCount[h]++;
+                dayViews[dw] += m.views;
+                dayCount[dw]++;
+                posts++;
+                total += m.views;
+            }
+            if (posts < 3) {
+                statsBox.addView(emptyText(ctx, "হিসাব করার মতো যথেষ্ট পোস্ট নেই।"));
+                return;
+            }
+            int bestH = -1;
+            double bestAvg = -1;
+            for (int h = 0; h < 24; h++) {
+                if (hourCount[h] == 0) continue;
+                double avg = hourViews[h] / (double) hourCount[h];
+                if (avg > bestAvg) {
+                    bestAvg = avg;
+                    bestH = h;
+                }
+            }
+            int bestD = -1;
+            double bestDAvg = -1;
+            for (int d = 0; d < 7; d++) {
+                if (dayCount[d] == 0) continue;
+                double avg = dayViews[d] / (double) dayCount[d];
+                if (avg > bestDAvg) {
+                    bestDAvg = avg;
+                    bestD = d;
+                }
+            }
+            LinearLayout best = new LinearLayout(ctx);
+            best.setOrientation(LinearLayout.VERTICAL);
+            best.setPadding(dp(16), dp(16), dp(16), dp(16));
+            best.setBackground(card(accent()));
+            best.addView(text(ctx, "🏆 সেরা সময়: " + hourLabel(bestH), 20, true, 0xFFFFFFFF));
+            if (bestD >= 0) best.addView(text(ctx, "📅 সেরা দিন: " + WEEKDAYS[bestD], 16, false, 0xFFFFFFFF));
+            best.addView(text(ctx, posts + " টা পোস্ট, গড় ভিউ " + (total / posts), 13, false, 0xEEFFFFFF));
+            statsBox.addView(best);
+
+            TextView h2 = text(ctx, "ঘণ্টা অনুযায়ী গড় ভিউ:", 14, true, textColor());
+            h2.setLayoutParams(lp(14));
+            statsBox.addView(h2);
+            double max = bestAvg <= 0 ? 1 : bestAvg;
+            for (int h = 0; h < 24; h++) {
+                if (hourCount[h] == 0) continue;
+                double avg = hourViews[h] / (double) hourCount[h];
+                int bars = (int) Math.round(avg / max * 12);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < bars; i++) sb.append('█');
+                TextView row = text(ctx, String.format(Locale.US, "%-12s %s %d", hourLabel(h), sb.toString(), Math.round(avg)), 13, h == bestH, h == bestH ? accent() : textColor());
+                row.setTypeface(h == bestH ? Typeface.DEFAULT_BOLD : Typeface.MONOSPACE);
+                statsBox.addView(row);
+            }
+        }));
     }
 
 }
