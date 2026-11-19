@@ -1,4 +1,4 @@
-name: Build NayaGram AAB & APK
+name: Build Bartalap APK
 
 on:
   push:
@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -65,6 +68,12 @@ jobs:
         run: |
           echo "Telegram API ID and Hash configured successfully."
 
+      - name: Restore stable Bartalap signing key (same key every build so updates install over old version)
+        uses: actions/cache@v4
+        with:
+          path: TMessagesProj/config/nayagrampro.jks
+          key: bartalap-release-keystore-v1
+
       - name: Decode or generate release keystore
         env:
           RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
@@ -90,8 +99,10 @@ jobs:
                 -alias "$KEY_ALIAS" \
                 -keyalg RSA -keysize 4096 -validity 13880 \
                 -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
-                -dname "CN=NayaGram, OU=NayaGram Mobile, O=NayaGram, L=Rangpur, ST=Rangpur, C=BD"
+                -dname "CN=Bartalap, OU=Bartalap Mobile, O=Bartalap, L=Netrokona, ST=Mymensingh, C=BD"
             fi
+          elif [ -s TMessagesProj/config/nayagrampro.jks ]; then
+            echo "Reusing cached Bartalap signing keystore (stable signature across builds)."
           else
             echo "Keystore Base64 secret not provided. Auto-generating 38-year release keystore (13,880 days) with alias '$KEY_ALIAS'..."
             keytool -genkeypair -v \
@@ -99,7 +110,7 @@ jobs:
               -alias "$KEY_ALIAS" \
               -keyalg RSA -keysize 4096 -validity 13880 \
               -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
-              -dname "CN=NayaGram, OU=NayaGram Mobile, O=NayaGram, L=Rangpur, ST=Rangpur, C=BD"
+              -dname "CN=Bartalap, OU=Bartalap Mobile, O=Bartalap, L=Netrokona, ST=Mymensingh, C=BD"
           fi
           test -s TMessagesProj/config/nayagrampro.jks
           ls -la TMessagesProj/config/nayagrampro.jks
@@ -112,7 +123,7 @@ jobs:
           echo "APP_VERSION_NAME=$APP_VERSION_NAME" >> "$GITHUB_ENV"
           echo "APP_VERSION_TAG=$APP_VERSION_TAG" >> "$GITHUB_ENV"
           echo "=================================================="
-          echo " NayaGram v${APP_VERSION_NAME} - Build ${APP_VERSION_CODE} "
+          echo " Bartalap v${APP_VERSION_NAME} - Build ${APP_VERSION_CODE} "
           echo " Target SDK: 36 | Min SDK: 24 (Google Play Compliant)"
           echo "=================================================="
 
@@ -257,8 +268,8 @@ jobs:
             exit 1
           fi
           mkdir -p build_output
-          cp "$AAB_FILE" build_output/NayaGram-Release.aab
-          echo "Secured release AAB: $(ls -lh build_output/NayaGram-Release.aab)"
+          cp "$AAB_FILE" build_output/Bartalap-Release.aab
+          echo "Secured release AAB: $(ls -lh build_output/Bartalap-Release.aab)"
 
           # Download bundletool with exponential retries and wget fallback
           if [ ! -f bundletool-all-1.17.2.jar ] || [ $(stat -c%s bundletool-all-1.17.2.jar 2>/dev/null || echo 0) -lt 10000000 ]; then
@@ -273,7 +284,7 @@ jobs:
             --ks-pass=pass:"$STORE_PASS" \
             --ks-key-alias="$KEY_ALIAS" \
             --key-pass=pass:"$KEY_PASS"
-          unzip -p build_output/app.apks universal.apk > build_output/NayaGram-Release.apk
+          unzip -p build_output/app.apks universal.apk > build_output/Bartalap-Release.apk
           ls -lh build_output/
 
           cat > /tmp/nayagram-phone.json << 'EOF'
@@ -324,20 +335,20 @@ jobs:
           PY
           ls -lh build_output/phone-splits build_output/play-download-size.txt
 
-      - name: Upload NayaGram Release AAB
+      - name: Upload Bartalap Release AAB
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: NayaGram-Release-AAB
-          path: build_output/NayaGram-Release.aab
+          name: Bartalap-Release-AAB
+          path: build_output/Bartalap-Release.aab
           if-no-files-found: warn
 
-      - name: Upload NayaGram Standalone Release APK (100% Stable, Crash-Free)
+      - name: Upload Bartalap Release APK
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: NayaGram-Release-APK
-          path: build_output/NayaGram-Release.apk
+          name: Bartalap-Release-APK
+          path: build_output/Bartalap-Release.apk
           if-no-files-found: warn
 
       - name: Publish Direct GitHub Release
@@ -346,9 +357,9 @@ jobs:
         if: github.ref == 'refs/heads/master'
         with:
           tag_name: "${{ env.APP_VERSION_TAG }}-b${{ github.run_number }}"
-          name: "NayaGram Release v${{ env.APP_VERSION_NAME }} (Build ${{ env.APP_VERSION_CODE }})"
+          name: "Bartalap v${{ env.APP_VERSION_NAME }} (Build ${{ env.APP_VERSION_CODE }})"
           body: |
-            ### 🚀 NayaGram Release v${{ env.APP_VERSION_NAME }} (Build ${{ env.APP_VERSION_CODE }})
+            ### 🚀 Bartalap v${{ env.APP_VERSION_NAME }} (Build ${{ env.APP_VERSION_CODE }})
             
             **Release Highlights:**
             - **Version Code**: `${{ env.APP_VERSION_CODE }}`
@@ -357,8 +368,8 @@ jobs:
             - **Anti-Delete Hardening**: Protected push deletions, channel post media/replydata preservation, and persistent dialog preview badges.
             - **Glowing AI & Pencil Formatting Tools**: Animated vibrant glowing AI button, sleek pencil formatting menu (with Quote, Spoiler, Bold, Italic, Mono, Strike, Underline, Create Link, Date, Regular & Text Style), 16 KB compliance, and Play Store version 41052, MTProto Layer 233 (Telegram 13.2.2), fixed Bot API 10.4 Interactive Widgets (twidget/widget-sandbox v0.6.5), Screenshots/Screen Recording support, and redesigned Voice Changer UI/UX with Male & Female voice presets.
           files: |
-            build_output/NayaGram-Release.apk
-            build_output/NayaGram-Release.aab
+            build_output/Bartalap-Release.apk
+            build_output/Bartalap-Release.aab
           draft: false
           prerelease: false
           make_latest: true
