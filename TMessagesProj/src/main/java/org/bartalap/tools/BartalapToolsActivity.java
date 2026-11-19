@@ -290,6 +290,26 @@ public class BartalapToolsActivity extends BaseFragment {
         TextView intro = text(ctx, "Bartalap-এর নিজস্ব ফিচার। যেকোনোটায় চাপ দিন 👇\nটিপস: যেকোনো চ্যাটে ⋮ → ⚡ Bartalap Tools থেকে Quick Reply, AI উত্তর, নোট সরাসরি পাবেন।", 14, false, grayColor());
         intro.setPadding(dp(4), dp(8), dp(4), dp(4));
         content.addView(intro);
+        boolean digestOn = BartalapReminders.isDigestEnabled();
+        content.addView(itemCard(ctx, "🌙 ডেইলি ডাইজেস্ট: " + (digestOn ? "চালু ✅" : "বন্ধ"),
+                "প্রতিদিন রাত ৯টায় একটা নোটিফিকেশন: কতগুলো মেসেজ পড়া হয়নি, কার উত্তর বাকি। চাপ দিয়ে চালু/বন্ধ করুন",
+                v -> {
+                    boolean on = !BartalapReminders.isDigestEnabled();
+                    BartalapReminders.setDigestEnabled(on);
+                    if (on) {
+                        String now = BartalapReminders.buildDigest(currentAccount);
+                        if (getParentActivity() != null) {
+                            AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
+                            b.setTitle("চালু হয়েছে ✅ আজকের নমুনা:");
+                            b.setMessage(now);
+                            b.setPositiveButton("ঠিক আছে", null);
+                            showDialog(b.create());
+                        }
+                    } else {
+                        toast("ডেইলি ডাইজেস্ট বন্ধ");
+                    }
+                    build(ctx);
+                }, null));
         content.addView(itemCard(ctx, "🤖 AI সেটিংস", "Claude বা Gemini API Key দিন। তারপর যেকোনো চ্যাটে ⋮ → ⚡ Bartalap Tools থেকে AI উত্তর আর সারাংশ পাবেন",
                 v -> BartalapChatTools.aiSettings(getParentActivity(), null), null));
         content.addView(itemCard(ctx, "📥 স্মার্ট ইনবক্স", "যাদের উত্তর দেননি, আর যাদের ফলো-আপ দরকার, আলাদা লিস্টে",

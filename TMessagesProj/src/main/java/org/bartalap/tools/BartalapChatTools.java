@@ -98,6 +98,7 @@ public final class BartalapChatTools {
                 "🧾 AI দিয়ে চ্যাটের সারাংশ",
                 "📝 এই কন্টাক্টের নোট",
                 "💰 বাকির খাতায় যোগ করুন",
+                "😴 চ্যাট স্নুজ (পরে মনে করাবে)",
                 "⚙️ AI সেটিংস"
         };
         AlertDialog.Builder b = new AlertDialog.Builder(a);
@@ -110,6 +111,7 @@ public final class BartalapChatTools {
                 case 3: aiSummary(chat, dialogId); break;
                 case 4: contactNote(chat, dialogId); break;
                 case 5: addToLedger(chat, dialogId); break;
+                case 6: snooze(chat, dialogId); break;
                 default: aiSettings(a, null); break;
             }
         });
@@ -321,6 +323,42 @@ public final class BartalapChatTools {
             if (after != null && AiClient.isConfigured()) after.run();
         });
         b.show();
+    }
+
+    // ------------------------------------------------------------ snooze
+
+    private static void snooze(ChatActivity chat, long dialogId) {
+        Activity a = chat.getParentActivity();
+        String name = chatName(chat, dialogId, false);
+        CharSequence[] opts = {"১ ঘণ্টা পর", "৩ ঘণ্টা পর", "আজ রাত ৯টায়", "কাল সকাল ৯টায়"};
+        AlertDialog.Builder b = new AlertDialog.Builder(a);
+        b.setTitle("😴 কখন মনে করাবে?");
+        b.setItems(opts, (d, which) -> {
+            long minutes;
+            java.util.Calendar now = java.util.Calendar.getInstance();
+            java.util.Calendar t = java.util.Calendar.getInstance();
+            t.set(java.util.Calendar.MINUTE, 0);
+            t.set(java.util.Calendar.SECOND, 0);
+            if (which == 0) {
+                minutes = 60;
+            } else if (which == 1) {
+                minutes = 180;
+            } else {
+                if (which == 2) {
+                    t.set(java.util.Calendar.HOUR_OF_DAY, 21);
+                } else {
+                    t.add(java.util.Calendar.DAY_OF_YEAR, 1);
+                    t.set(java.util.Calendar.HOUR_OF_DAY, 9);
+                }
+                if (!t.after(now)) t.add(java.util.Calendar.DAY_OF_YEAR, 1);
+                minutes = Math.max(1, (t.getTimeInMillis() - now.getTimeInMillis()) / 60000L);
+            }
+            BartalapReminders.snooze(chat.getCurrentAccount(), dialogId, name, minutes);
+            toast("চ্যাটটা Archive-এ গেল। সময় হলে নোটিফিকেশন দিয়ে ফিরিয়ে আনবে ✅");
+            chat.finishFragment();
+        });
+        b.setNegativeButton("বাতিল", null);
+        chat.showDialog(b.create());
     }
 
     // ------------------------------------------------------------ notes & ledger
