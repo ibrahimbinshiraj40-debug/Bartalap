@@ -157,7 +157,7 @@ public class IncomingMessageInterceptor {
                     PowerManager pm = (PowerManager) ApplicationLoader.applicationContext.getSystemService(Context.POWER_SERVICE);
                     if (pm != null) {
                         if (activeWakeLock == null) {
-                            activeWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NayaGram:AutoReplyWakeLock");
+                            activeWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Bartalap:AutoReplyWakeLock");
                             activeWakeLock.setReferenceCounted(false);
                         }
                         if (!activeWakeLock.isHeld()) {

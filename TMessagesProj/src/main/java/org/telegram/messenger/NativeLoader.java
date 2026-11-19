@@ -237,7 +237,7 @@ public class NativeLoader {
     private static void noteCallAbi() {
         String abi = getAbiFolder();
         if ("arm64-v8a".equals(abi) || "armeabi-v7a".equals(abi)) {
-            android.util.Log.i("NayaGramCall", "VoIP via libtmessages abi=" + abi + " (no duplicate tgvoip/webrtc load)");
+            android.util.Log.i("BartalapCall", "VoIP via libtmessages abi=" + abi + " (no duplicate tgvoip/webrtc load)");
         }
     }
     //public static native void crash();

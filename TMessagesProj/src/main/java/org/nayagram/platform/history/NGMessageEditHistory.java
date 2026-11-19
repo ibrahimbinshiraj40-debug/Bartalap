@@ -254,7 +254,7 @@ public final class NGMessageEditHistory {
         if (editCount > 0) {
             subHeader.setText("Captured " + editCount + (editCount == 1 ? " edit" : " edits") + " (" + revisions.size() + " versions) • Tap any card to copy");
         } else {
-            subHeader.setText("Edited before NayaGram captured the original text • Tap card to copy");
+            subHeader.setText("Edited before Bartalap captured the original text • Tap card to copy");
         }
         subHeader.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13f);
         subHeader.setTypeface(AndroidUtilities.bold());

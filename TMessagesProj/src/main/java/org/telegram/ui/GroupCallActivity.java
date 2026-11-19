@@ -7685,7 +7685,7 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
         builder.setNegativeButton(getString(R.string.Cancel), null);
         if (fromOverlayWindow) {
             if (!org.nayagram.platform.NayaConfig.allowFloatingOverlay(context)) {
-                android.util.Log.e("NayaGramCall", "leave dialog skipped: SYSTEM_ALERT_WINDOW not granted");
+                android.util.Log.e("BartalapCall", "leave dialog skipped: SYSTEM_ALERT_WINDOW not granted");
                 return;
             }
             builder.setDimEnabled(false);

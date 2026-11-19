@@ -820,14 +820,14 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         items.add(SettingCell.Factory.of(3, IconBackgroundColors.GREEN.top, IconBackgroundColors.GREEN.bottom, R.drawable.settings_privacy, getString(R.string.SettingsPrivacySecurity), getString(R.string.SettingsPrivacySecurityInfo)));
 
         // 3. NayaGram section placed right BELOW Privacy & Security
-        items.add(UItem.asHeader("NayaGram"));
+        items.add(UItem.asHeader("Bartalap"));
         items.add(SettingCell.Factory.of(100, 0xFF7E57C2, 0xFF5E35B1, R.drawable.ic_naya_settings, "Bartalap Settings", "Bartalap Tools, auto answer, security & tools", ""));
         items.add(SettingCell.Factory.of(108, IconBackgroundColors.GREEN.top, IconBackgroundColors.GREEN.bottom, R.drawable.settings_devices, "Infonity AI 💎", "Official AI Assistant @InfonityAI_Bot", ""));
         items.add(SettingCell.Factory.of(112, IconBackgroundColors.PURPLE.top, IconBackgroundColors.CYAN.bottom, R.drawable.msg_admins, "NG Admin 🛡️", "Official Leadership & Admins", ""));
         items.add(SettingCell.Factory.of(106, IconBackgroundColors.ORANGE.top, IconBackgroundColors.ORANGE.bottom, R.drawable.settings_chat, "App Theme", "Customize wallpaper, colors & bubbles", ""));
         items.add(SettingCell.Factory.of(104, IconBackgroundColors.PURPLE.top, IconBackgroundColors.PURPLE.bottom, R.drawable.settings_data, "App Cache", "Free storage & clean cache (1-Tap)", ""));
         items.add(SettingCell.Factory.of(105, IconBackgroundColors.ORANGE_DEEP.top, IconBackgroundColors.ORANGE_DEEP.bottom, R.drawable.settings_folders, "Chat finder", "Find groups, channels & bots", ""));
-        items.add(SettingCell.Factory.of(110, 0xFF1FB0A5, 0xFF12968C, R.drawable.ic_naya_info, "About NayaGram", "v" + getInstalledAppVersionName() + " • Platform & Info", ""));
+        items.add(SettingCell.Factory.of(110, 0xFF1FB0A5, 0xFF12968C, R.drawable.ic_naya_info, "About Bartalap", "v" + getInstalledAppVersionName() + " • Platform & Info", ""));
         items.add(UItem.asShadow(createNayaCopyrightSpan()));
 
         items.add(SettingCell.Factory.of(2, IconBackgroundColors.ORANGE.top, IconBackgroundColors.ORANGE.bottom, R.drawable.settings_chat, getString(R.string.SettingsChat), getString(R.string.SettingsChatInfo)));
@@ -1201,7 +1201,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     break;
             }
             int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-            String nayaGramInfo = "NayaGram for Android v" + getInstalledAppVersionName() + " (" + code + ")";
+            String nayaGramInfo = "Bartalap for Android v" + getInstalledAppVersionName() + " (" + code + ")";
             String copyrightLine = "© " + currentYear + " 𝐍𝐚𝐲𝐚𝐆𝐫𝐚𝐦 𝐏𝐥𝐚𝐭𝐟𝐨𝐫𝐦. All rights reserved.\nBuilt with ❤️ in Bangladesh 🇧🇩";
             return nayaGramInfo + "\n" + copyrightLine + "\n" + abi;
         } catch (Exception e) {

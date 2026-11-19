@@ -155,7 +155,7 @@ public class NotificationsService extends Service {
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification)
-                .setContentTitle("NayaGram Auto Answer Active")
+                .setContentTitle("Bartalap Auto Answer Active")
                 .setContentText("Replying automatically in background while keeping offline status private")
                 .setOngoing(true)
                 .setSilent(true)

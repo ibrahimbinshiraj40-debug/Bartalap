@@ -132,7 +132,7 @@ public class NGHiddenAccountsActivity extends UniversalFragment implements Notif
         items.add(UItem.asCheck(VIBRATE, "Vibrate on tap").setChecked(NGHiddenAccounts.isVibrateEnabled()));
         items.add(UItem.asShadow(null));
         items.add(UItem.asCheck(HIDE_ON_BACKGROUND, "Hide when leaving app").setChecked(NGHiddenAccounts.isHideOnBackground()));
-        items.add(UItem.asShadow("Automatically lock hidden accounts when you leave NayaGram or lock your screen."));
+        items.add(UItem.asShadow("Automatically lock hidden accounts when you leave Bartalap or lock your screen."));
         items.add(UItem.asButton(TURN_OFF, "Turn Off Hidden Accounts").red());
         items.add(UItem.asShadow(null));
     }

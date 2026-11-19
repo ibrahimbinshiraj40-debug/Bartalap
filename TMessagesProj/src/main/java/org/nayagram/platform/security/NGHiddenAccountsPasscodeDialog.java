@@ -146,7 +146,7 @@ public class NGHiddenAccountsPasscodeDialog extends Dialog {
         titleCol.addView(topTitle);
 
         TextView topSub = new TextView(ctx);
-        topSub.setText("Protected by NayaGram Biometric & Passcode Shield");
+        topSub.setText("Protected by Bartalap Biometric & Passcode Shield");
         topSub.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11.5f);
         topSub.setTextColor(secondaryTextColor);
         titleCol.addView(topSub);

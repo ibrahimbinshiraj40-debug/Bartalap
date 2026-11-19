@@ -53,7 +53,7 @@ public final class NGChatMenuHelper {
                 .setColors(dark ? 0xFFFFFFFF : 0xFF0284C7, dark ? 0xFF38BDF8 : 0xFF0284C7);
         headerItem.lazilyAddSubItem(ITEM_CHAT_ID, R.drawable.settings_faq, "ID: " + dialogId)
                 .setColors(dark ? 0xFFFFFFFF : 0xFF7C3AED, dark ? 0xFFA78BFA : 0xFF7C3AED);
-        headerItem.lazilyAddSubItem(ITEM_NG_SETTINGS, R.drawable.settings_features, "NayaGram Settings")
+        headerItem.lazilyAddSubItem(ITEM_NG_SETTINGS, R.drawable.settings_features, "Bartalap Settings")
                 .setColors(dark ? 0xFFFFFFFF : 0xFF0284C7, dark ? 0xFF00D4FF : 0xFF0284C7);
     }
 
@@ -123,7 +123,7 @@ public final class NGChatMenuHelper {
         ScrollView scroll = new ScrollView(activity);
         scroll.addView(list);
         AlertDialog.Builder b = new AlertDialog.Builder(activity);
-        b.setTitle("NayaGram In-Chat Settings");
+        b.setTitle("Bartalap In-Chat Settings");
         b.setView(scroll);
         b.setPositiveButton("Close", null);
         AlertDialog dialog = b.show();
@@ -143,7 +143,7 @@ public final class NGChatMenuHelper {
                     showEditTextSignatureDialog(activity, sp);
                 } else if (which == 3) {
                     if (!isLocked && !NayaConfig.getInstance().isBiometricChatLockerEnabled()) {
-                        Toast.makeText(activity, "Enable Biometric Chat Locker in NayaGram Settings first.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity, "Enable Biometric Chat Locker in Bartalap Settings first.", Toast.LENGTH_LONG).show();
                         return;
                     }
                     if (isLocked) {

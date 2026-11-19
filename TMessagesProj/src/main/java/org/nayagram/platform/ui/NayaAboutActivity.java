@@ -119,7 +119,7 @@ public class NayaAboutActivity extends BaseFragment {
         hero.addView(logoOuter, LayoutHelper.createLinear(154, 154, Gravity.CENTER_HORIZONTAL, 0, 0, 0, 16));
 
         TextView name = new TextView(context);
-        name.setText("NayaGram");
+        name.setText("Bartalap");
         name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 28);
         name.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
         name.setTextColor(Color.WHITE);
@@ -137,7 +137,7 @@ public class NayaAboutActivity extends BaseFragment {
         // Version row — Novagram style dual cards
         LinearLayout verRow = new LinearLayout(context);
         verRow.setOrientation(LinearLayout.HORIZONTAL);
-        verRow.addView(makeVerCard(context, "NayaGram", getAppVersion(), "App version"), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 0, 0, 8, 0));
+        verRow.addView(makeVerCard(context, "Bartalap", getAppVersion(), "App version"), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 0, 0, 8, 0));
         verRow.addView(makeVerCard(context, "Telegram", "13.1.4", "Core engine"), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 8, 0, 0, 0));
         hero.addView(verRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
@@ -174,13 +174,13 @@ public class NayaAboutActivity extends BaseFragment {
         LinearLayout nCol = new LinearLayout(context);
         nCol.setOrientation(LinearLayout.VERTICAL);
         nCol.addView(bold(context, "Independent messaging client", 14, Theme.getColor(Theme.key_windowBackgroundWhiteBlackText)));
-        TextView nBody = normal(context, "NayaGram is not the official Telegram app. It uses the Telegram API under applicable terms. Telegram® belongs to Telegram FZ-LLC.", 12, Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2));
+        TextView nBody = normal(context, "Bartalap is not the official Telegram app. It uses the Telegram API under applicable terms. Telegram® belongs to Telegram FZ-LLC.", 12, Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2));
         nCol.addView(nBody, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 4, 0, 0));
         notice.addView(nCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
         root.addView(notice, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 18));
 
         // ════════ WHY ════════
-        root.addView(section(context, "Why NayaGram"), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 10));
+        root.addView(section(context, "Why Bartalap"), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 10));
         LinearLayout pillars = new LinearLayout(context);
         pillars.setOrientation(LinearLayout.HORIZONTAL);
         pillars.addView(pillar(context, R.drawable.msg_secret, C_TEAL, "Encrypted", "Secret chats stay end-to-end on your device"), LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1f, 0, 0, 6, 0));
@@ -346,7 +346,7 @@ public class NayaAboutActivity extends BaseFragment {
             rateCol.setOrientation(LinearLayout.VERTICAL);
             TextView rateStars = bold(context, "★ ★ ★ ★ ★   OFFICIAL RATING", 11, C_CYAN);
             rateCol.addView(rateStars);
-            TextView rateTitle = bold(context, "Rate NayaGram on Google Play", 16, Color.WHITE);
+            TextView rateTitle = bold(context, "Rate Bartalap on Google Play", 16, Color.WHITE);
             rateCol.addView(rateTitle, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
             TextView rateSub = normal(context, "Share your honest 5-star review & support our team", 12, 0xE6FFFFFF);
             rateCol.addView(rateSub, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
@@ -395,7 +395,7 @@ public class NayaAboutActivity extends BaseFragment {
         pHead.addView(iconBadge(context, R.drawable.ic_naya_info, C_BLUE, 40), LayoutHelper.createLinear(40, 40, 0, 0, 12, 0));
         LinearLayout pTitles = new LinearLayout(context);
         pTitles.setOrientation(LinearLayout.VERTICAL);
-        pTitles.addView(bold(context, "NayaGram Platform", 16, Theme.getColor(Theme.key_windowBackgroundWhiteBlackText)));
+        pTitles.addView(bold(context, "Bartalap Platform", 16, Theme.getColor(Theme.key_windowBackgroundWhiteBlackText)));
         pTitles.addView(normal(context, "Built with care in Bangladesh 🇧🇩", 12, C_BLUE), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
         pHead.addView(pTitles, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
         platform.addView(pHead, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 12));
@@ -404,7 +404,7 @@ public class NayaAboutActivity extends BaseFragment {
 
         TextView footer = new TextView(context);
         int year = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-        footer.setText("NayaGram v" + getAppVersion() + " • Build " + getInternalBuildCode() + "\n© " + year + " NayaGram Platform\nNot affiliated with Telegram FZ-LLC\nAll rights reserved");
+        footer.setText("Bartalap v" + getAppVersion() + " • Build " + getInternalBuildCode() + "\n© " + year + " Bartalap Platform\nNot affiliated with Telegram FZ-LLC\nAll rights reserved");
         footer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
         footer.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText3));
         footer.setGravity(Gravity.CENTER);
@@ -654,7 +654,7 @@ public class NayaAboutActivity extends BaseFragment {
         try {
             Intent intent = new Intent(Intent.ACTION_SENDTO);
             intent.setData(Uri.parse("mailto:" + SUPPORT_EMAIL));
-            intent.putExtra(Intent.EXTRA_SUBJECT, "NayaGram Support");
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Bartalap Support");
             if (getParentActivity() != null)
                 getParentActivity().startActivity(Intent.createChooser(intent, "Contact support"));
         } catch (Exception e) {

@@ -395,7 +395,7 @@ public class NGSafetyActivity extends BaseFragment {
         logoParams.gravity = Gravity.CENTER_HORIZONTAL;
         hero.addView(heroLogo, logoParams);
 
-        TextView heroTitle = text(context, gate ? "Unlock NayaGram" : "Verify NG Authenticator", 24, Theme.isCurrentThemeDark() ? Theme.getColor(Theme.key_windowBackgroundWhiteBlackText) : 0xFF0284C7, true);
+        TextView heroTitle = text(context, gate ? "Unlock Bartalap" : "Verify NG Authenticator", 24, Theme.isCurrentThemeDark() ? Theme.getColor(Theme.key_windowBackgroundWhiteBlackText) : 0xFF0284C7, true);
         heroTitle.setGravity(Gravity.CENTER);
         heroTitle.setPadding(0, AndroidUtilities.dp(10), 0, AndroidUtilities.dp(4));
         hero.addView(heroTitle, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -464,7 +464,7 @@ public class NGSafetyActivity extends BaseFragment {
             ContentValues values = new ContentValues();
             values.put(MediaStore.Images.Media.DISPLAY_NAME, "NG-Authenticator-QR.png");
             values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/NayaGram");
+            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Bartalap");
             values.put(MediaStore.Images.Media.IS_PENDING, 1);
             android.net.Uri imageUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
             if (imageUri == null) throw new IllegalStateException("Could not create image entry");
@@ -478,7 +478,7 @@ public class NGSafetyActivity extends BaseFragment {
             ContentValues ready = new ContentValues();
             ready.put(MediaStore.Images.Media.IS_PENDING, 0);
             context.getContentResolver().update(imageUri, ready, null, null);
-            toast(context, "QR saved to Pictures/NayaGram");
+            toast(context, "QR saved to Pictures/Bartalap");
         } catch (Exception e) {
             toast(context, "Could not save QR code. Keep the secret private.");
         } finally {

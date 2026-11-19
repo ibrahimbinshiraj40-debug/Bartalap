@@ -29,7 +29,7 @@ public class NGAdminActivity extends BaseFragment {
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setAllowOverlayTitle(true);
-        actionBar.setTitle("NayaGram Leadership");
+        actionBar.setTitle("Bartalap Leadership");
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(int id) {
@@ -63,7 +63,7 @@ public class NGAdminActivity extends BaseFragment {
         banner.addView(bTitle, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 6));
 
         TextView bDesc = new TextView(context);
-        bDesc.setText("Direct access to official NayaGram founders, platform administrators, and verified support channels.");
+        bDesc.setText("Direct access to official Bartalap founders, platform administrators, and verified support channels.");
         bDesc.setTextSize(13);
         bDesc.setTextColor(0xFFE2E8F0);
         banner.addView(bDesc, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
@@ -84,7 +84,7 @@ public class NGAdminActivity extends BaseFragment {
             R.drawable.msg_admins,
             "Founder & Super Admin",
             "@NGSupreme",
-            "Full platform owner & lead architect of NayaGram.",
+            "Full platform owner & lead architect of Bartalap.",
             0xFF0284C7,
             v -> MessagesController.getInstance(currentAccount).openByUserName("NGSupreme", NGAdminActivity.this, 1)
         ), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 10));
@@ -143,7 +143,7 @@ public class NGAdminActivity extends BaseFragment {
             try {
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                 emailIntent.setData(Uri.parse("mailto:support.nayagram@gmail.com"));
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "NayaGram Inquiry");
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bartalap Inquiry");
                 getParentActivity().startActivity(emailIntent);
             } catch (Exception ignored) {}
         });

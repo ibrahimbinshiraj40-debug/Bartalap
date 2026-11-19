@@ -75,13 +75,13 @@ public class VoIPHelper {
 
 	private static void safeCreateGroupCall(Activity activity, AccountInstance account, TLRPC.Chat chat, TLRPC.InputPeer peer, boolean hasFew, String hash) {
 		if (!(activity instanceof LaunchActivity) || activity.isFinishing()) {
-			android.util.Log.e("NayaGramCall", "skip GroupCallActivity.create");
+			android.util.Log.e("BartalapCall", "skip GroupCallActivity.create");
 			return;
 		}
 		try {
 			GroupCallActivity.create((LaunchActivity) activity, account, chat, peer, hasFew, hash);
 		} catch (Throwable e) {
-			android.util.Log.e("NayaGramCall", "GroupCallActivity.create", e);
+			android.util.Log.e("BartalapCall", "GroupCallActivity.create", e);
 		}
 	}
 
@@ -345,7 +345,7 @@ public class VoIPHelper {
 				activity.startService(intent);
 			}
 		} catch (Throwable e) {
-			Log.e("NayaGramCall", "joinConference", e);
+			Log.e("BartalapCall", "joinConference", e);
 			FileLog.e(e);
 		}
 	}
@@ -470,7 +470,7 @@ public class VoIPHelper {
 				activity.startService(intent);
 			}
 		} catch (Throwable e) {
-			Log.e("NayaGramCall", "doInitiateCall", e);
+			Log.e("BartalapCall", "doInitiateCall", e);
 			FileLog.e(e);
 		}
 	}

@@ -12,7 +12,7 @@ import java.util.Locale;
  */
 public final class NayaGramLinkPreview {
 
-    public static final String BRAND = "NayaGram";
+    public static final String BRAND = "Bartalap";
 
     private NayaGramLinkPreview() {
     }

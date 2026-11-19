@@ -725,7 +725,7 @@ public class GroupCallPip implements NotificationCenter.NotificationCenterDelega
             return;
         }
         if (!org.nayagram.platform.NayaConfig.allowFloatingOverlay(context)) {
-            android.util.Log.e("NayaGramCall", "NG bubble disabled until SYSTEM_ALERT_WINDOW is granted");
+            android.util.Log.e("BartalapCall", "NG bubble disabled until SYSTEM_ALERT_WINDOW is granted");
             try {
                 Toast.makeText(context.getApplicationContext(), "Display over other apps is off. Call stays in the app.", Toast.LENGTH_SHORT).show();
             } catch (Throwable ignored) {
@@ -735,7 +735,7 @@ public class GroupCallPip implements NotificationCenter.NotificationCenterDelega
         try {
             showInner(context, account);
         } catch (Throwable e) {
-            android.util.Log.e("NayaGramCall", "GroupCallPip.show", e);
+            android.util.Log.e("BartalapCall", "GroupCallPip.show", e);
             instance = null;
         }
     }

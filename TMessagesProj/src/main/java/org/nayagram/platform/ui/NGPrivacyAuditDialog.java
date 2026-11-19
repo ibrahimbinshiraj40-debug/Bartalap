@@ -90,7 +90,7 @@ public class NGPrivacyAuditDialog {
         // 2. Biometric Chat Locker
         boolean bioActive = cfg.isBiometricChatLockerEnabled();
         statusContainer.addView(createStatusRow(context, R.drawable.ic_naya_fingerprint, 0xFF10B981,
-                "Biometric Chat Locker", bioActive ? "Ready · lock individual chats from In-Chat Settings" : "Off · enable in NayaGram Settings",
+                "Biometric Chat Locker", bioActive ? "Ready · lock individual chats from In-Chat Settings" : "Off · enable in Bartalap Settings",
                 bioActive, bioActive ? "ENABLED" : "OFF", true));
 
         // 4. Focus Mode
@@ -100,7 +100,7 @@ public class NGPrivacyAuditDialog {
 
         // Bottom note
         TextView noteView = new TextView(context);
-        noteView.setText("NayaGram strictly complies with Google Play policies. Security & privacy operations execute locally on your device.");
+        noteView.setText("Bartalap strictly complies with Google Play policies. Security & privacy operations execute locally on your device.");
         noteView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
         noteView.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
         noteView.setGravity(Gravity.CENTER_HORIZONTAL);

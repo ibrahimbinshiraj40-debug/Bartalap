@@ -117,7 +117,7 @@ public final class BiometricChatLocker {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             try {
                 BiometricPrompt prompt = new BiometricPrompt.Builder(activity)
-                        .setTitle("NayaGram Biometric Lock")
+                        .setTitle("Bartalap Biometric Lock")
                         .setSubtitle("Confirm your biometric or passcode to open this locked chat")
                         .setDeviceCredentialAllowed(true)
                         .build();
@@ -152,7 +152,7 @@ public final class BiometricChatLocker {
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             try {
                 BiometricPrompt prompt = new BiometricPrompt.Builder(activity)
-                        .setTitle("NayaGram Biometric Lock")
+                        .setTitle("Bartalap Biometric Lock")
                         .setSubtitle("Confirm fingerprint to open this locked chat")
                         .setNegativeButton("Cancel", activity.getMainExecutor(), (dialog, which) -> {
                             if (callback != null) callback.onUnlockFailed();

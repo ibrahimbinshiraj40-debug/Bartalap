@@ -241,11 +241,11 @@ public class NGHubActivity extends BaseFragment implements NotificationCenter.No
     @Override
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitle("NG Hub");
+        actionBar.setTitle("Bartalap Hub");
         actionBar.setAllowOverlayTitle(true);
         org.telegram.ui.ActionBar.ActionBarMenu menu = actionBar.createMenu();
         org.telegram.ui.ActionBar.ActionBarMenuItem cornerItem = menu.addItem(9920, R.drawable.msg_channel);
-        cornerItem.setContentDescription("NG Hub Details");
+        cornerItem.setContentDescription("Bartalap Hub Details");
         org.telegram.ui.Components.RLottieImageView cornerIcon = cornerItem.getIconView();
         if (cornerIcon != null) {
             android.graphics.drawable.GradientDrawable cornerBg = new android.graphics.drawable.GradientDrawable(
@@ -480,10 +480,10 @@ public class NGHubActivity extends BaseFragment implements NotificationCenter.No
         ImageView logo = new ImageView(context);
         logo.setImageResource(R.drawable.nayagram_intro_logo);
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        logo.setContentDescription("NayaGram logo");
+        logo.setContentDescription("Bartalap logo");
         hero.addView(logo, LayoutHelper.createLinear(84, 84, Gravity.CENTER_HORIZONTAL));
         TextView title = new TextView(context);
-        title.setText("NG Hub");
+        title.setText("Bartalap Hub");
         title.setTextSize(26);
         title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         title.setTextColor(COLOR_CYAN);
@@ -786,7 +786,7 @@ public class NGHubActivity extends BaseFragment implements NotificationCenter.No
         botCard.addView(botTitle);
 
         TextView botSub = new TextView(context);
-        botSub.setText(isBn ? "বটফাদার এপিআই টোকেন দিয়ে ইনস্ট্যান্ট লগইন" : "Instant BotFather API token login into NayaGram");
+        botSub.setText(isBn ? "বটফাদার এপিআই টোকেন দিয়ে ইনস্ট্যান্ট লগইন" : "Instant BotFather API token login into Bartalap");
         botSub.setTextSize(12);
         botSub.setTextColor(dark ? 0xFF94A3B8 : 0xFF475569);
         botCard.addView(botSub, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));

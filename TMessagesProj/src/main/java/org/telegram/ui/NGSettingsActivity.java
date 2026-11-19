@@ -199,7 +199,7 @@ public class NGSettingsActivity extends BaseFragment {
         overflowItem.addSubItem(3, R.drawable.outline_shield_check, "Privacy & Security Audit").setIconColor(0xFF059669);
         overflowItem.addSubItem(4, R.drawable.msg_send, "Contact Support").setIconColor(0xFF2563EB);
         overflowItem.addSubItem(7, R.drawable.msg_admins, "Leadership & Admin").setIconColor(0xFF7C3AED);
-        overflowItem.addSubItem(6, R.drawable.ic_naya_info, "About NayaGram").setIconColor(0xFF0284C7);
+        overflowItem.addSubItem(6, R.drawable.ic_naya_info, "About Bartalap").setIconColor(0xFF0284C7);
         overflowItem.addSubItem(5, R.drawable.outline_revert_24, "Restore Defaults").setIconColor(0xFFDB2777);
 
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
@@ -213,7 +213,7 @@ public class NGSettingsActivity extends BaseFragment {
                     try {
                         Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                         emailIntent.setData(Uri.parse("mailto:support.nayagram@gmail.com"));
-                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "NayaGram Support & Inquiry");
+                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bartalap Support & Inquiry");
                         context.startActivity(emailIntent);
                     } catch (Exception ignored) {}
                 } else if (id == 7 || id == 8) {
@@ -390,11 +390,11 @@ public class NGSettingsActivity extends BaseFragment {
                         cfg.setBiometricChatLockerEnabled(true);
                         cell.setChecked(true);
                         BulletinFactory.of(NGSettingsActivity.this).createSimpleBulletin(R.raw.done,
-                                "Locker enabled. Open a chat's NayaGram In-Chat Settings to protect it.").show();
+                                "Locker enabled. Open a chat's Bartalap In-Chat Settings to protect it.").show();
                     } else {
                         AlertDialog.Builder disableDialog = new AlertDialog.Builder(getParentActivity());
                         disableDialog.setTitle("Turn off Biometric Chat Locker?");
-                        disableDialog.setMessage("You will not be able to protect additional chats. Existing protected chats stay locked until you open each chat's NayaGram In-Chat Settings and unlock it. Continue?");
+                        disableDialog.setMessage("You will not be able to protect additional chats. Existing protected chats stay locked until you open each chat's Bartalap In-Chat Settings and unlock it. Continue?");
                         disableDialog.setNegativeButton("Keep enabled", null);
                         disableDialog.setPositiveButton("Turn off", (dialog, which) -> {
                             cfg.setBiometricChatLockerEnabled(false);
@@ -489,7 +489,7 @@ public class NGSettingsActivity extends BaseFragment {
             cleanB.setMessage("Found reclaimable cache:\n\n" +
                     "• Total Cache: " + report.getFormattedTotal() + "\n" +
                     "• Cached Files: " + report.fileCount + "\n\n" +
-                    "Clean cache now to boost NayaGram speed?");
+                    "Clean cache now to boost Bartalap speed?");
             cleanB.setPositiveButton("Clean Now", (d, w) -> {
                 org.nayagram.platform.storage.SmartStorageDoctor.getInstance().cleanCache(getParentActivity(), (freed, success) -> {
                     BulletinFactory.of(NGSettingsActivity.this).createSimpleBulletin(
@@ -540,7 +540,7 @@ public class NGSettingsActivity extends BaseFragment {
     private void showResetDialog() {
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
         b.setTitle("Reset Settings");
-        b.setMessage("Reset all NayaGram features to defaults?");
+        b.setMessage("Reset all Bartalap features to defaults?");
         b.setPositiveButton("Reset", (d, w) -> {
             NayaConfig.getInstance().resetToDefaults();
             if (listAdapter != null) listAdapter.notifyDataSetChanged();
@@ -563,10 +563,10 @@ public class NGSettingsActivity extends BaseFragment {
         String body;
         if (position == rowVerifiedBadge || position == rowChannelVerifiedBadge || position == rowBotVerifiedBadge) {
             AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-            b.setTitle("NayaGram Verified Badge");
-            b.setMessage("About NayaGram Verified Badge:\n\n" +
-                "\u2022 Purpose: A visual badge designed to highlight trusted community members, channels, groups, and bots across the NayaGram ecosystem.\n\n" +
-                "\u2022 Important Notice: This badge is exclusively an internal NayaGram customization feature. It is NOT official verification from Telegram (Telegram FZ-LLC), nor is it issued or endorsed by any government entity or regulatory authority. Official Telegram server verifications are independent and remain authoritative.\n\n" +
+            b.setTitle("Bartalap Verified Badge");
+            b.setMessage("About Bartalap Verified Badge:\n\n" +
+                "\u2022 Purpose: A visual badge designed to highlight trusted community members, channels, groups, and bots across the Bartalap ecosystem.\n\n" +
+                "\u2022 Important Notice: This badge is exclusively an internal Bartalap customization feature. It is NOT official verification from Telegram (Telegram FZ-LLC), nor is it issued or endorsed by any government entity or regulatory authority. Official Telegram server verifications are independent and remain authoritative.\n\n" +
                 "\u2014 \u09ac\u09be\u0982\u09b2\u09be \u09ac\u09bf\u09ac\u09b0\u09a3 \u2014\n\n" +
                 "\u2022 \u0989\u09a6\u09cd\u09a6\u09c7\u09b6\u09cd\u09af: \u09a8\u09be\u09af\u09bc\u09be\u0997\u09cd\u09b0\u09be\u09ae \u09aa\u09cd\u09b2\u09cd\u09af\u09be\u099f\u09ab\u09b0\u09cd\u09ae\u09c7 \u09ac\u09bf\u09b6\u09cd\u09ac\u09b8\u09cd\u09a4 \u09b8\u09a6\u09b8\u09cd\u09af, \u099a\u09cd\u09af\u09be\u09a8\u09c7\u09b2, \u0997\u09cd\u09b0\u09c1\u09aa \u0993 \u09ac\u099f\u09a6\u09c7\u09b0 \u098f\u0995\u099f\u09bf \u09b8\u09c1\u09a8\u09cd\u09a6\u09b0 \u09ad\u09bf\u099c\u09cd\u09af\u09c1\u09af\u09bc\u09be\u09b2 \u09aa\u09b0\u09bf\u099a\u09bf\u09a4\u09bf \u09a6\u09c7\u0993\u09af\u09bc\u09be।\n\n" +
                 "\u2022 \u099c\u09b0\u09c1\u09b0\u09bf \u09ac\u09bf\u099c\u09cd\u099e\u09aa\u09cd\u09a4\u09bf: \u098f\u0987 \u09ac\u09cd\u09af\u09be\u099c\u099f\u09bf \u09b8\u09ae\u09cd\u09aa\u09c2\u09b0\u09cd\u09a3 \u09a8\u09be\u09af\u09bc\u09be\u0997\u09cd\u09b0\u09be\u09ae \u0985\u09cd\u09af\u09be\u09aa\u09c7\u09b0 \u0985\u09ad\u09cd\u09af\u09a8\u09cd\u09a4\u09b0\u09c0\u09a3 \u09ad\u09bf\u099c\u09cd\u09af\u09c1\u09af\u09bc\u09be\u09b2 \u09ab\u09bf\u099a\u09be\u09b0\u0964 \u098f\u099f\u09bf \u09ae\u09c2\u09b2 \u099f\u09c7\u09b2\u09bf\u0997\u09cd\u09b0\u09be\u09ae (Telegram FZ-LLC) \u09ac\u09be \u09b8\u09b0\u0995\u09be\u09b0\u09bf \u0995\u09cb\u09a8\u09cb \u09b8\u0982\u09b8\u09cd\u09a5\u09be\u09b0 \u0985\u09ab\u09bf\u09b6\u09bf\u09af\u09bc\u09be\u09b2 \u09ad\u09c7\u09b0\u09bf\u09ab\u09bf\u0995\u09c7\u09b6\u09a8 \u09a8\u09af\u09bc।");
@@ -605,7 +605,7 @@ public class NGSettingsActivity extends BaseFragment {
             body = "Shows Telegram user ID and data-center hints where the profile screen supports it.";
         } else if (position == rowBiometricLocker) {
             title = "Biometric Chat Locker";
-            body = "Protect individual chats with your device's secure screen lock, fingerprint, or face unlock when supported. Enable this feature here, then open the chosen chat's three-dot menu → NayaGram In-Chat Settings → Biometric Chat Lock. The chat is closed immediately and authentication is required before it can be opened again.\n\nA secure PIN, password, or pattern must be configured in Android Settings first. Turning this master switch off prevents new chat locks; existing protected chats remain locked until you unlock them individually. This is a chat-entry lock, not a separate hidden vault.";
+            body = "Protect individual chats with your device's secure screen lock, fingerprint, or face unlock when supported. Enable this feature here, then open the chosen chat's three-dot menu → Bartalap In-Chat Settings → Biometric Chat Lock. The chat is closed immediately and authentication is required before it can be opened again.\n\nA secure PIN, password, or pattern must be configured in Android Settings first. Turning this master switch off prevents new chat locks; existing protected chats remain locked until you unlock them individually. This is a chat-entry lock, not a separate hidden vault.";
         } else if (position == rowFocusMode) {
             title = "Focus & Wellbeing Mode";
             body = "Not active yet. Quiet hours, notification scheduling and exceptions are not connected.\n\nIt does not mute Telegram notifications by itself unless you also change notification settings.";
@@ -617,7 +617,7 @@ public class NGSettingsActivity extends BaseFragment {
             body = "Not active yet. Low-battery detection and automatic playback or background-work controls are not connected.\n\nTelegram's own sync still runs so messages arrive.";
         } else if (position == rowInstantTranslator) {
             title = "In-Chat Instant Translator";
-            body = "Not active yet. This screen is not connected to a translation service or an in-chat translate action.\n\nIt does not send your chats to a private NayaGram server.";
+            body = "Not active yet. This screen is not connected to a translation service or an in-chat translate action.\n\nIt does not send your chats to a private Bartalap server.";
         } else if (position == rowIntlClock) {
             title = "24-hour clock";
             body = "Shows times as 13:45 instead of 1:45 PM. Useful when you travel or talk to people in other countries.\n\nThis only changes how times look on your phone. Telegram is not contacted.";
@@ -641,7 +641,7 @@ public class NGSettingsActivity extends BaseFragment {
             body = "Does not download media until you open it. Useful on limited mobile plans. This uses Telegram's stream-media setting.";
         } else if (position == rowResetDefaults) {
             title = "Restore Defaults";
-            body = "Resets NayaGram feature switches to their original values. Your Telegram chats are not deleted.";
+            body = "Resets Bartalap feature switches to their original values. Your Telegram chats are not deleted.";
         } else {
             return;
         }
@@ -871,7 +871,7 @@ public class NGSettingsActivity extends BaseFragment {
                         R.drawable.outline_shield_check,
                         0xFF0284C7,
                         "User Profile Verified Badge",
-                        "Visual badge for profile (Internal NayaGram feature, not official/govt)",
+                        "Visual badge for profile (Internal Bartalap feature, not official/govt)",
                         cfg.isVerifiedBadgeEnabled(),
                         true
                     );
@@ -880,7 +880,7 @@ public class NGSettingsActivity extends BaseFragment {
                         R.drawable.msg_channel,
                         0xFF7C3AED,
                         "Channel & Group Verified Badge",
-                        "Visual badge for channels & groups (Internal NayaGram feature, not official/govt)",
+                        "Visual badge for channels & groups (Internal Bartalap feature, not official/govt)",
                         cfg.isChannelVerifiedBadgeEnabled(),
                         true
                     );
@@ -889,7 +889,7 @@ public class NGSettingsActivity extends BaseFragment {
                         R.drawable.msg_bot,
                         0xFF10B981,
                         "Bot Verified Badge",
-                        "Visual badge for bots (Internal NayaGram feature, not official/govt)",
+                        "Visual badge for bots (Internal Bartalap feature, not official/govt)",
                         cfg.isBotVerifiedBadgeEnabled(),
                         true
                     );
@@ -966,7 +966,7 @@ public class NGSettingsActivity extends BaseFragment {
                 }
             } else if (type == 3) {
                 TextInfoPrivacyCell info = (TextInfoPrivacyCell) holder.itemView;
-                info.setText("NayaGram Platform · Built with ❤️ in Bangladesh");
+                info.setText("Bartalap Platform · Built with ❤️ in Bangladesh");
             }
         }
     }

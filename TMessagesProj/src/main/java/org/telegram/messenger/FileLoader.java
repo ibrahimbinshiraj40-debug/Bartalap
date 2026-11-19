@@ -814,7 +814,7 @@ public class FileLoader extends BaseController {
             int msgDate = mo.messageOwner != null ? mo.messageOwner.date : 0;
             String docName = getDocumentFileName(document);
             if (org.nayagram.platform.NayaGram.shouldBlockDocument(document, msgDate) || org.nayagram.platform.NayaGram.shouldBlockFile(docName, msgDate)) {
-                FileLog.d("NayaGram Security Shield: Prevented file load for " + docName);
+                FileLog.d("Bartalap Security Shield: Prevented file load for " + docName);
                 return;
             }
         }
@@ -1038,7 +1038,7 @@ public class FileLoader extends BaseController {
 
                 if (!operation.isPreloadVideoOperation()) {
                     if (NayaGram.shouldBlockDownloadedPayload(sentByMe, finalFile)) {
-                        FileLog.d("NayaGram Security Shield: blocked payload inside archive " + fileName);
+                        FileLog.d("Bartalap Security Shield: blocked payload inside archive " + fileName);
                         if (finalFile != null && finalFile.exists()) {
                             finalFile.delete();
                         }

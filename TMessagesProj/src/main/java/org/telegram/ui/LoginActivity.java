@@ -3716,7 +3716,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 {
                     String appCodeTitle = overrideTitle != null ? overrideTitle : getString(currentType == AUTH_TYPE_MESSAGE ? R.string.SentAppCodeTitle : R.string.SentSmsCodeTitle);
                     if (currentType == AUTH_TYPE_MESSAGE && overrideTitle == null && appCodeTitle != null && !appCodeTitle.toLowerCase().contains("telegram")) {
-                        appCodeTitle = appCodeTitle.replace("NayaGram", "NayaGram or TeleGram");
+                        appCodeTitle = appCodeTitle.replace("Bartalap", "Bartalap or TeleGram");
                     }
                     titleTextView.setText(appCodeTitle);
                 }
@@ -4390,14 +4390,14 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 if (currentType == AUTH_TYPE_MESSAGE) {
                     String rawSentApp = LocaleController.formatString("SentAppCodeWithPhone", R.string.SentAppCodeWithPhone, LocaleController.addNbsp(number));
                     if (rawSentApp != null) {
-                        rawSentApp = rawSentApp.replace("**NayaGram** app", "**NayaGram Or TeleGram App**")
-                                               .replace("**Telegram** app", "**NayaGram Or TeleGram App**")
-                                               .replace("**NayaGram** অ্যাপে", "**NayaGram Or TeleGram App**-এ");
+                        rawSentApp = rawSentApp.replace("**Bartalap** app", "**Bartalap Or TeleGram App**")
+                                               .replace("**Telegram** app", "**Bartalap Or TeleGram App**")
+                                               .replace("**Bartalap** অ্যাপে", "**Bartalap Or TeleGram App**-এ");
                     }
                     SpannableStringBuilder ssb = AndroidUtilities.replaceTags(rawSentApp);
-                    int hlIdx = TextUtils.indexOf(ssb, "NayaGram Or TeleGram App");
+                    int hlIdx = TextUtils.indexOf(ssb, "Bartalap Or TeleGram App");
                     if (hlIdx >= 0) {
-                        int hlEnd = hlIdx + "NayaGram Or TeleGram App".length();
+                        int hlEnd = hlIdx + "Bartalap Or TeleGram App".length();
                         ssb.setSpan(new android.text.style.ForegroundColorSpan(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4)), hlIdx, hlEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
                     str = ssb;

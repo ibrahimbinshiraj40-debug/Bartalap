@@ -21,7 +21,7 @@ public final class FeatureTutorialDialog {
             "WELCOME TO THE NAYAGRAM FEATURES TUTORIAL\n\n" +
             "This page explains how the real feature cards work. It is a guide, not a promise that every planned feature is available.\n\n" +
             "HOW TO USE THE MAIN FEATURES PAGE\n" +
-            "1. Open NayaGram Features and read each card's description before changing its setting.\n" +
+            "1. Open Bartalap Features and read each card's description before changing its setting.\n" +
             "2. A working ON/OFF card changes a setting connected to Telegram's native behavior. Tap it again to switch it back.\n" +
             "3. External Link Guard can ask for confirmation before opening unfamiliar external websites when enabled. It is not a guarantee that every harmful link will be detected.\n" +
             "4. Readable Text adjusts Telegram's message text size for easier reading.\n" +
@@ -97,7 +97,7 @@ public final class FeatureTutorialDialog {
         hero.setBackground(heroBackground);
 
         TextView heroTitle = new TextView(context);
-        heroTitle.setText("🌐 NayaGram Feature Guide");
+        heroTitle.setText("🌐 Bartalap Feature Guide");
         heroTitle.setTextColor(0xFF075985);
         heroTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         heroTitle.setTypeface(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD);

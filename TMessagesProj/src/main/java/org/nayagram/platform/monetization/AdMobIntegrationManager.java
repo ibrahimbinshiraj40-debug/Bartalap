@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class AdMobIntegrationManager implements INGMonetizationProvider {
 
-    private static final String TAG = "NayaGramAdMob";
+    private static final String TAG = "BartalapAdMob";
     private static final long RETRY_DELAY_MS = 60_000L;
 
     private static volatile AdMobIntegrationManager instance;
@@ -128,7 +128,7 @@ public final class AdMobIntegrationManager implements INGMonetizationProvider {
                 initializationStarted.set(false);
                 Log.e(TAG, "Google Mobile Ads initialization failed.", error);
             }
-        }, "NayaGram-AdMob-Init").start();
+        }, "Bartalap-AdMob-Init").start();
     }
 
     private void loadInterstitial() {

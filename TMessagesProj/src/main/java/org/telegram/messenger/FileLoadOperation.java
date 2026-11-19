@@ -1656,7 +1656,7 @@ public class FileLoadOperation {
                     if (!ungzip) {
                         boolean sentByMe = parentObject instanceof MessageObject && ((MessageObject) parentObject).isOutOwner();
                         if (NayaGram.shouldBlockDownloadedPayload(sentByMe, cacheFileTempLocal)) {
-                            FileLog.d("NayaGram Security Shield: blocked incoming file hidden as an Android package " + cacheFileFinal);
+                            FileLog.d("Bartalap Security Shield: blocked incoming file hidden as an Android package " + cacheFileFinal);
                             cacheFileTempLocal.delete();
                             Utilities.stageQueue.postRunnable(() -> {
                                 onFail(false, 0);

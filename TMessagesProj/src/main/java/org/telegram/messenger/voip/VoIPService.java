@@ -809,7 +809,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 		try {
 			return onStartCommandInner(intent, flags, startId);
 		} catch (Throwable e) {
-			android.util.Log.e("NayaGramCall", "onStartCommand", e);
+			android.util.Log.e("BartalapCall", "onStartCommand", e);
 			try {
 				Toast.makeText(this, "Call service initializing", Toast.LENGTH_SHORT).show();
 			} catch (Throwable ignored) {
@@ -1134,7 +1134,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 
 	private void startOutgoingCall() {
 		if (tgVoip == null) {
-			android.util.Log.e("NayaGramCall", "VoIP controller is null");
+			android.util.Log.e("BartalapCall", "VoIP controller is null");
 			AndroidUtilities.runOnUIThread(() -> {
 				try {
 					Toast.makeText(VoIPService.this, "Call service initializing", Toast.LENGTH_SHORT).show();
@@ -1146,7 +1146,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 		try {
 			startOutgoingCallInner();
 		} catch (Throwable e) {
-			android.util.Log.e("NayaGramCall", "startOutgoingCall", e);
+			android.util.Log.e("BartalapCall", "startOutgoingCall", e);
 			callFailed();
 		}
 	}
@@ -1375,14 +1375,14 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 			// Android 14+ refuses MediaProjection capture unless a mediaProjection-type foreground service is running.
 			if (!updateCurrentForegroundType() || !hasMediaProjectionForeground()) {
 				gotMediaProjection = false;
-				android.util.Log.e("NayaGramCall", "screen capture skipped: mediaProjection foreground not started");
+				android.util.Log.e("BartalapCall", "screen capture skipped: mediaProjection foreground not started");
 				return;
 			}
 		}
 		try {
 			createCaptureDeviceInternal(screencast);
 		} catch (Throwable t) {
-			android.util.Log.e("NayaGramCall", "createCaptureDevice", t);
+			android.util.Log.e("BartalapCall", "createCaptureDevice", t);
 			if (screencast) {
 				gotMediaProjection = false;
 			}
@@ -4083,7 +4083,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 			});
 			if (fromOverlayWindow) {
 				if (!org.nayagram.platform.NayaConfig.allowFloatingOverlay(context)) {
-					android.util.Log.e("NayaGramCall", "overlay skipped: SYSTEM_ALERT_WINDOW not granted");
+					android.util.Log.e("BartalapCall", "overlay skipped: SYSTEM_ALERT_WINDOW not granted");
 					return;
 				} else if (Build.VERSION.SDK_INT >= 26) {
 					bottomSheet.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
@@ -4986,7 +4986,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 
 			checkUpdateBluetoothHeadset();
 		} catch (Throwable x) {
-			android.util.Log.e("NayaGramCall", "onCreate init", x);
+			android.util.Log.e("BartalapCall", "onCreate init", x);
 			try {
 				callFailed();
 			} catch (Throwable ignored) {
@@ -5024,7 +5024,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 				}
 			}
 			} catch (Throwable fg) {
-				android.util.Log.e("NayaGramCall", "startForeground", fg);
+				android.util.Log.e("BartalapCall", "startForeground", fg);
 				try {
 					int safeType = android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK;
 					if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -5038,7 +5038,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 						}
 					}
 				} catch (Throwable fg2) {
-					android.util.Log.e("NayaGramCall", "startForeground fallback", fg2);
+					android.util.Log.e("BartalapCall", "startForeground fallback", fg2);
 					try { stopSelf(); } catch (Throwable ignored) {}
 				}
 			}
@@ -5661,7 +5661,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 				startForeground(id, notification);
 				return true;
 			} catch (Throwable t) {
-				android.util.Log.e("NayaGramCall", "startForegroundSafe", t);
+				android.util.Log.e("BartalapCall", "startForegroundSafe", t);
 				return false;
 			}
 		}
@@ -5671,7 +5671,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 			lastForegroundType = type;
 			return true;
 		} catch (Throwable t) {
-			android.util.Log.e("NayaGramCall", "startForegroundSafe typed", t);
+			android.util.Log.e("BartalapCall", "startForegroundSafe typed", t);
 		}
 		// MEDIA_PLAYBACK is the least restricted type; keeps the call service alive if the richer type is refused.
 		try {
@@ -5679,7 +5679,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 			lastForegroundType = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK;
 			return true;
 		} catch (Throwable t2) {
-			android.util.Log.e("NayaGramCall", "startForegroundSafe fallback", t2);
+			android.util.Log.e("BartalapCall", "startForegroundSafe fallback", t2);
 			return false;
 		}
 	}

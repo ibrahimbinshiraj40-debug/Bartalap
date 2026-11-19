@@ -50,7 +50,7 @@ public class NayaFeaturesActivity extends BaseFragment {
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setAllowOverlayTitle(true);
-        actionBar.setTitle("NayaGram Features");
+        actionBar.setTitle("Bartalap Features");
 
         // 3-dots overflow menu
         ActionBarMenu menu = actionBar.createMenu();
@@ -174,7 +174,7 @@ public class NayaFeaturesActivity extends BaseFragment {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         TextView description = new TextView(context);
-        description.setText("A step-by-step guide to NayaGram features. Tutorial only — it does not activate feature engines.");
+        description.setText("A step-by-step guide to Bartalap features. Tutorial only — it does not activate feature engines.");
         description.setTextColor(dark ? 0xFFCBD5E1 : 0xFF334155);
         description.setTextSize(12);
         description.setLineSpacing(AndroidUtilities.dp(1), 1.08f);
@@ -278,7 +278,7 @@ public class NayaFeaturesActivity extends BaseFragment {
     private void showFeatureHealthCheck(Context context) {
         NayaConfig config = NayaConfig.getInstance();
         StringBuilder report = new StringBuilder();
-        report.append("NayaGram feature readiness\n\n");
+        report.append("Bartalap feature readiness\n\n");
         report.append("External Link Guard: ").append(config.isLinkGuardEnabled() ? "ON" : "OFF").append('\n');
         report.append("Readable Text: ").append(config.isReadableTextEnabled() ? "ON" : "OFF").append('\n');
         report.append("Reduce Motion: ").append(config.isReduceMotion() ? "ON" : "OFF").append('\n');
@@ -294,13 +294,13 @@ public class NayaFeaturesActivity extends BaseFragment {
 
     private void confirmExportSettings(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Export NayaGram Settings");
-        builder.setMessage("Create a shareable JSON backup of NayaGram feature preferences? Custom auto-reply text and account/chat data are excluded.");
+        builder.setTitle("Export Bartalap Settings");
+        builder.setMessage("Create a shareable JSON backup of Bartalap feature preferences? Custom auto-reply text and account/chat data are excluded.");
         builder.setPositiveButton("Export", (dialog, which) -> {
             try {
                 Intent send = new Intent(Intent.ACTION_SEND);
                 send.setType("application/json");
-                send.putExtra(Intent.EXTRA_SUBJECT, "NayaGram settings backup");
+                send.putExtra(Intent.EXTRA_SUBJECT, "Bartalap settings backup");
                 send.putExtra(Intent.EXTRA_TEXT, NayaConfig.getInstance().exportSettingsJson());
                 context.startActivity(Intent.createChooser(send, "Share settings backup"));
             } catch (Exception ignored) {
@@ -321,13 +321,13 @@ public class NayaFeaturesActivity extends BaseFragment {
 
     private void showSupportDialog(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("💬 NayaGram Official Support");
-        builder.setMessage("Need help, feature requests, or have questions regarding NayaGram?\n\nOfficial Email: " + SUPPORT_EMAIL + "\n\nOur support team is available 24/7 to assist you.");
+        builder.setTitle("💬 Bartalap Official Support");
+        builder.setMessage("Need help, feature requests, or have questions regarding Bartalap?\n\nOfficial Email: " + SUPPORT_EMAIL + "\n\nOur support team is available 24/7 to assist you.");
         builder.setPositiveButton("Email Us", (dialog, which) -> {
             try {
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                 emailIntent.setData(Uri.parse("mailto:" + SUPPORT_EMAIL));
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "NayaGram Support & Inquiry");
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bartalap Support & Inquiry");
                 context.startActivity(emailIntent);
             } catch (Exception ignored) {
             }
@@ -339,7 +339,7 @@ public class NayaFeaturesActivity extends BaseFragment {
     private void restoreAllDefaults(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("🔄 Restore Default Settings");
-        builder.setMessage("Are you sure you want to reset all NayaGram feature settings to their factory defaults?");
+        builder.setMessage("Are you sure you want to reset all Bartalap feature settings to their factory defaults?");
         builder.setPositiveButton("Reset", (dialog, which) -> {
             NayaConfig.getInstance().resetToDefaults();
             if (adapter != null) {

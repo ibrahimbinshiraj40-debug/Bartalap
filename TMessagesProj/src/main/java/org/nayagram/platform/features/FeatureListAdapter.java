@@ -467,7 +467,7 @@ public class FeatureListAdapter extends RecyclerView.Adapter<FeatureListViewHold
 
             AlertDialog.Builder cleanBldr = new AlertDialog.Builder(context);
             cleanBldr.setTitle("🧹 Storage Analysis");
-            cleanBldr.setMessage("Found reclaimable cache:\n- Total Cache: " + report.getFormattedTotal() + "\n- Cached Files: " + report.fileCount + "\nClean cache now to boost NayaGram speed?");
+            cleanBldr.setMessage("Found reclaimable cache:\n- Total Cache: " + report.getFormattedTotal() + "\n- Cached Files: " + report.fileCount + "\nClean cache now to boost Bartalap speed?");
             cleanBldr.setPositiveButton("Clean Now", (d, w) -> {
                 SmartStorageDoctor.getInstance().cleanCache(context, (freed, success) -> {
                     if (fragment != null) {
@@ -642,7 +642,7 @@ public class FeatureListAdapter extends RecyclerView.Adapter<FeatureListViewHold
                 : "\n\nNot available yet. It will remain inactive until native implementation and testing are complete."))
                 : "";
         builder.setMessage(item.getDesc(currentLang) + availability + "\n\n" +
-                "Feature #" + displayNumber + " • NayaGram Exclusive");
+                "Feature #" + displayNumber + " • Bartalap Exclusive");
         builder.setPositiveButton("OK", null);
         builder.show();
     }

@@ -16,7 +16,7 @@ import org.telegram.messenger.UserConfig;
  * interstitials are capped to one per 20 minutes after meaningful usage.
  */
 public final class AdManager {
-    private static final String TAG = "NayaGramMonetization";
+    private static final String TAG = "BartalapMonetization";
     private static final String PREFS_NAME = "nayagram_ads";
     private static final String KEY_LAST_INTERSTITIAL_WALL_TIME = "last_interstitial_wall_time";
 

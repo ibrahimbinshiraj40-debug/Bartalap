@@ -84,7 +84,7 @@ public class NGAutoLockActivity extends BaseFragment {
     @Override
     public View createView(Context context) {
         actionBar.setAllowOverlayTitle(true);
-        actionBar.setTitle("Auto-lock NayaGram");
+        actionBar.setTitle("Auto-lock Bartalap");
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
@@ -112,7 +112,7 @@ public class NGAutoLockActivity extends BaseFragment {
         fragmentView = scroll;
 
         TextView title = new TextView(context);
-        title.setText("Auto-lock NayaGram");
+        title.setText("Auto-lock Bartalap");
         title.setTextSize(22);
         title.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
         title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
@@ -120,7 +120,7 @@ public class NGAutoLockActivity extends BaseFragment {
         root.addView(title);
 
         TextView description = new TextView(context);
-        description.setText("Choose when auto-lock should activate after NayaGram goes to the background. NG Authenticator must be enabled for this lock to require verification.");
+        description.setText("Choose when auto-lock should activate after Bartalap goes to the background. NG Authenticator must be enabled for this lock to require verification.");
         description.setTextSize(13);
         description.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2));
         description.setLineSpacing(AndroidUtilities.dp(2), 1.05f);

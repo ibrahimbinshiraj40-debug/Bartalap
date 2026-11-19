@@ -63,7 +63,7 @@ public class NayaGram {
         // Direct suffix check: endsWith("." + ext) or exact match
         for (String ext : BLOCKED_EXTENSIONS) {
             if (lower.endsWith("." + ext) || lower.equals(ext)) {
-                FileLog.d("NayaGram Security Shield: blocked incoming file " + fileName);
+                FileLog.d("Bartalap Security Shield: blocked incoming file " + fileName);
                 return true;
             }
         }
@@ -73,7 +73,7 @@ public class NayaGram {
         String[] parts = nameToSplit.split(java.util.regex.Pattern.quote("."));
         for (String part : parts) {
             if (BLOCKED_EXTENSIONS.contains(part)) {
-                FileLog.d("NayaGram Security Shield: blocked incoming cloaked file " + fileName);
+                FileLog.d("Bartalap Security Shield: blocked incoming cloaked file " + fileName);
                 return true;
             }
         }
@@ -112,7 +112,7 @@ public class NayaGram {
                 mime.equals("application/x-7z-compressed") ||
                 mime.equals("application/x-tar") ||
                 mime.equals("application/gzip")) {
-                FileLog.d("NayaGram Security Shield: blocked document by MIME " + mime);
+                FileLog.d("Bartalap Security Shield: blocked document by MIME " + mime);
                 return true;
             }
         }
@@ -126,7 +126,7 @@ public class NayaGram {
 
     /** Silent no-op: logs only. Zero screen popups or UI work. */
     public static void showBlockedNotice() {
-        FileLog.d("NayaGram Security Shield: file blocked silently.");
+        FileLog.d("Bartalap Security Shield: file blocked silently.");
     }
 
     public static CharSequence formatUserStatusText(CharSequence statusText) {

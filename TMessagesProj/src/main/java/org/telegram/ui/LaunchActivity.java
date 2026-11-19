@@ -9708,7 +9708,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 AndroidUtilities.runOnUIThread(() -> {
                     if (isFinishing()) return;
                     AlertDialog.Builder b = new AlertDialog.Builder(this);
-                    b.setTitle("Welcome to NayaGram! 🇧🇩");
+                    b.setTitle("Welcome to Bartalap! 🇧🇩");
                     b.setMessage("Join our official channel @NayaGramPro to receive the latest updates, exclusive features, themes, and community support.");
                     b.setPositiveButton("Join @NayaGramPro", (dialog, which) -> {
                         org.telegram.messenger.browser.Browser.openUrl(this, "https://t.me/NayaGramPro");

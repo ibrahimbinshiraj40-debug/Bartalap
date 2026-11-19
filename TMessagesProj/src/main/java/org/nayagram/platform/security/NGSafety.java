@@ -313,9 +313,9 @@ public final class NGSafety {
     public static String getOtpAuthUri(String accountLabel, String secret) {
         String user = accountLabel == null || accountLabel.trim().isEmpty() ? "user" : accountLabel.trim();
         // Keep the issuer/account separator colon literal as required by otpauth URI labels.
-        String label = "NayaGram:" + urlEncode(user);
+        String label = "Bartalap:" + urlEncode(user);
         return "otpauth://totp/" + label + "?secret=" + urlEncode(secret)
-                + "&issuer=" + urlEncode("NayaGram") + "&algorithm=SHA1&digits=6&period=30";
+                + "&issuer=" + urlEncode("Bartalap") + "&algorithm=SHA1&digits=6&period=30";
     }
 
     private static String urlEncode(String value) {

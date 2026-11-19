@@ -34,22 +34,22 @@
 
 **%1$s**
 
-তাতেও সমাধান না হলে অন্য নম্বর চেষ্টা করতে পারেন বা NayaGram সহায়তায় যোগাযোগ করতে পারেন।</string>
+তাতেও সমাধান না হলে অন্য নম্বর চেষ্টা করতে পারেন বা Bartalap সহায়তায় যোগাযোগ করতে পারেন।</string>
     <string name="DidNotGetTheCodeHelpButton">সহায়তা</string>
     <string name="DidNotGetTheCodeEditNumberButton">অন্য নম্বর</string>
     <string name="YourCode">ফোন যাচাইকরণ</string>
     <string name="SentSmsCode">আমরা আপনার **%1$s** নম্বরে একটি SMS যাচাইকরণ কোড পাঠিয়েছি।</string>
-    <string name="SentAppCode">আমরা আপনার অন্য ডিভাইসের **NayaGram Or TeleGram App**-এ একটি কোড পাঠিয়েছি।</string>
-    <string name="SentAppCodeWithPhone">আমরা %1$s নম্বরে সক্রিয় অন্য ডিভাইসের **NayaGram Or TeleGram App**-এ কোড পাঠিয়েছি।</string>
-    <string name="SentAppCodeTitle">NayaGram অথবা TeleGram-এর বার্তা দেখুন</string>
+    <string name="SentAppCode">আমরা আপনার অন্য ডিভাইসের **Bartalap Or TeleGram App**-এ একটি কোড পাঠিয়েছি।</string>
+    <string name="SentAppCodeWithPhone">আমরা %1$s নম্বরে সক্রিয় অন্য ডিভাইসের **Bartalap Or TeleGram App**-এ কোড পাঠিয়েছি।</string>
+    <string name="SentAppCodeTitle">Bartalap অথবা TeleGram-এর বার্তা দেখুন</string>
     <string name="SentFragmentCode">Fragment প্ল্যাটফর্মের Anonymous Numbers বিভাগে %1$s এর জন্য কোড পান।</string>
     <string name="SentSmsCodeTitle">কোড লিখুন</string>
     <string name="OpenFragment">Fragment-এ যান</string>
     <string name="SentCallCode">আমরা **%1$s** নম্বরে কল করছি।
 
-কল রিসিভ করার প্রয়োজন নেই, NayaGram স্বয়ংক্রিয়ভাবে কোড পেয়ে যাবে।</string>
+কল রিসিভ করার প্রয়োজন নেই, Bartalap স্বয়ংক্রিয়ভাবে কোড পেয়ে যাবে।</string>
     <string name="SentCallOnly">কোডটি জানাতে আমরা আপনার **%1$s** নম্বরে কল করছি।</string>
-    <string name="CallText">NayaGram আপনাকে %1$d:%2$02d এর মধ্যে কল করবে</string>
+    <string name="CallText">Bartalap আপনাকে %1$d:%2$02d এর মধ্যে কল করবে</string>
     <string name="SmsText">আমরা %1$d:%2$02d এর মধ্যে একটি SMS পাঠাব</string>
     <string name="Calling">কল করা হচ্ছে...</string>
     <string name="SendingSms">SMS পাঠানো হচ্ছে...</string>
@@ -123,7 +123,7 @@
     <string name="PleaseEnterNewSecondPasswordHint">নতুন পাসওয়ার্ড পুনরায় লিখুন</string>
     <string name="RecoveryEmail">পুনরুদ্ধার ইমেইল</string>
     <string name="RecoveryEmailTitle">পুনরুদ্ধার ইমেইল</string>
-    <string name="RecoveryEmailSubtitle">পাসওয়ার্ড রিসেট এবং NayaGram অ্যাকাউন্টে অ্যাক্সেস ফিরে পেতে পুনরুদ্ধার ইমেইল সেট করুন।</string>
+    <string name="RecoveryEmailSubtitle">পাসওয়ার্ড রিসেট এবং Bartalap অ্যাকাউন্টে অ্যাক্সেস ফিরে পেতে পুনরুদ্ধার ইমেইল সেট করুন।</string>
     <string name="YourEmail">আপনার ইমেইল</string>
     <string name="YourNewEmail">আপনার নতুন ইমেইল</string>
     <string name="YourLoginEmailChangedSuccess">আপনার ইমেইল পরিবর্তন করা হয়েছে।</string>
@@ -132,7 +132,7 @@
     <string name="YourEmailInfo">একটি বৈধ ইমেইল যোগ করুন। পাসওয়ার্ড ভুলে গেলে এটিই পুনরুদ্ধারের একমাত্র মাধ্যম।</string>
     <string name="YourEmailSkip">এড়িয়ে যান</string>
     <string name="YourEmailSkipWarning">সতর্কতা</string>
-    <string name="YourEmailSkipWarningText">পাসওয়ার্ড ভুলে গেলে আপনি আপনার NayaGram অ্যাকাউন্টের অ্যাক্সেস চিরতরে হারিয়ে ফেলবেন।</string>
+    <string name="YourEmailSkipWarningText">পাসওয়ার্ড ভুলে গেলে আপনি আপনার Bartalap অ্যাকাউন্টের অ্যাক্সেস চিরতরে হারিয়ে ফেলবেন।</string>
     <string name="YourEmailAlmostThere">প্রায় সম্পন্ন!</string>
     <string name="YourEmailAlmostThereText">দ্বি-পদক্ষেপ যাচাইকরণ সম্পূর্ণ করতে আপনার ইমেইলটি চেক করুন (স্প্যাম ফোল্ডার সহ)।</string>
     <string name="YourPasswordSuccess">সফল হয়েছে!</string>
@@ -209,7 +209,7 @@
     <string name="EnterCode">কোড লিখুন</string>
     <string name="ResendCodeInfo">যাচাইকরণ কোডটি আপনার ইমেইলে পাঠানো হয়েছে।</string>
     <string name="EnabledPasswordText">আপনি দ্বি-পদক্ষেপ যাচাইকরণ চালু করেছেন।
-আপনার NayaGram অ্যাকাউন্টে লগইন করতে এই পাসওয়ার্ডটি প্রয়োজন হবে।</string>
+আপনার Bartalap অ্যাকাউন্টে লগইন করতে এই পাসওয়ার্ডটি প্রয়োজন হবে।</string>
     <string name="AddEmailTitle">ইমেইল যোগ করুন</string>
     <string name="AddEmailSubtitle">অ্যাকাউন্ট সুরক্ষিত রাখতে একটি বৈধ ইমেইল ঠিকানা লিখুন।</string>
     <string name="EnterNewEmail">নতুন ইমেইল লিখুন</string>
@@ -219,7 +219,7 @@
     <string name="CheckYourNewEmail">নতুন ইমেইল চেক করুন</string>
     <string name="CheckYourNewEmailSubtitle">আপনার নতুন %1$s ইমেইলে প্রেরিত কোডটি লিখুন।</string>
     <string name="LoginOrSingInWithGoogle">অথবা</string>
-    <string name="Page1Title">NayaGram</string>
+    <string name="Page1Title">Bartalap</string>
     <string name="Page2Title">দ্রুততম</string>
     <string name="Page3Title">বিনামূল্যে</string>
     <string name="Page4Title">সুরক্ষিত</string>
@@ -227,12 +227,12 @@
     <string name="Page6Title">ক্লাউড-ভিত্তিক</string>
     <string name="Page1Message">বিশ্বের **সবচেয়ে দ্রুতগতির** বার্তাপ্রেরণ প্ল্যাটফর্ম।
 এটি সম্পূর্ণ **বিনামূল্যে** এবং **সুরক্ষিত**।</string>
-    <string name="Page2Message">**NayaGram** যেকোনো অ্যাপ্লিকেশনের চেয়ে
+    <string name="Page2Message">**Bartalap** যেকোনো অ্যাপ্লিকেশনের চেয়ে
 দ্রুততম গতিতে বার্তা পৌঁছে দেয়।</string>
-    <string name="Page3Message">**NayaGram** চ্যাট ও মিডিয়ার জন্য সীমাহীন ক্লাউড স্টোরেজ সুবিধা দেয়।</string>
-    <string name="Page4Message">**NayaGram** আপনার বার্তাকে হ্যাকারদের আক্রমণ থেকে নিরাপদ রাখে।</string>
-    <string name="Page5Message">**NayaGram**-এ মিডিয়া এবং চ্যাটের আকারের ওপর কোনো কৃত্রিম সীমাবদ্ধতা নেই।</string>
-    <string name="Page6Message">**NayaGram** আপনাকে একাধিক ডিভাইস থেকে একই সাথে ব্যবহারের সুযোগ দেয়।</string>
+    <string name="Page3Message">**Bartalap** চ্যাট ও মিডিয়ার জন্য সীমাহীন ক্লাউড স্টোরেজ সুবিধা দেয়।</string>
+    <string name="Page4Message">**Bartalap** আপনার বার্তাকে হ্যাকারদের আক্রমণ থেকে নিরাপদ রাখে।</string>
+    <string name="Page5Message">**Bartalap**-এ মিডিয়া এবং চ্যাটের আকারের ওপর কোনো কৃত্রিম সীমাবদ্ধতা নেই।</string>
+    <string name="Page6Message">**Bartalap** আপনাকে একাধিক ডিভাইস থেকে একই সাথে ব্যবহারের সুযোগ দেয়।</string>
     <string name="StartMessaging">বার্তা পাঠানো শুরু করুন</string>
     <string name="formatterBoostExpired">dd MMM yyyy</string>
     <string name="formatterGiveawayCard">dd MMM yyyy</string>
@@ -277,7 +277,7 @@
     <string name="LogInWithBotToken">বট টোকেন দিয়ে লগইন</string>
     <string name="BotTokenDialogTitle">বট টোকেন দিয়ে লগইন</string>
     <string name="BotTokenDialogDescription">@BotFather থেকে প্রাপ্ত বট টোকেনটি লিখুন।</string>
-<string name="SettingsLanguage">ভাষা</string><string name="SettingsLanguageInfo">NayaGram-এর ভাষা পরিবর্তন করুন</string>    <string name="AppIcon">এনজি অ্যাপ আইকন</string>
+<string name="SettingsLanguage">ভাষা</string><string name="SettingsLanguageInfo">Bartalap-এর ভাষা পরিবর্তন করুন</string>    <string name="AppIcon">এনজি অ্যাপ আইকন</string>
     <string name="AppIconDefault">এনজি সায়ান (NG Cyan)</string>
     <string name="AppIconVintage">এনজি ব্লু (NG Blue)</string>
     <string name="AppIconAqua">এনজি পার্পল (NG Purple)</string>

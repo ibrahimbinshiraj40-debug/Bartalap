@@ -153,7 +153,7 @@ public class NayaConfig {
     /** Hours before the same private chat gets another auto-reply (1 to 168). */
     public int getAutoReplyCooldownHours() { return preferences.getInt(KEY_AUTO_REPLY_COOLDOWN_H, 1); }
     public void setAutoReplyCooldownHours(int hours) { preferences.edit().putInt(KEY_AUTO_REPLY_COOLDOWN_H, Math.max(1, Math.min(168, hours))).apply(); }
-    public String getAutoReplyText() { return preferences.getString(KEY_AUTO_REPLY_TEXT, "Hello! I am currently busy. I will get back to you soon. (Sent via NayaGram Auto-Reply)"); }
+    public String getAutoReplyText() { return preferences.getString(KEY_AUTO_REPLY_TEXT, "Hello! I am currently busy. I will get back to you soon. (Sent via Bartalap Auto-Reply)"); }
     public void setAutoReplyText(String t) { preferences.edit().putString(KEY_AUTO_REPLY_TEXT, t).apply(); }
 
     /** Stealth Ghost Presence: Keep user offline and prevent auto-reply from pulling last-seen forward. */

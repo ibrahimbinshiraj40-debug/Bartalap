@@ -153,7 +153,7 @@ public class AutoReplyManager {
             if (backgroundWakeLock == null) {
                 PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
                 if (pm != null) {
-                    backgroundWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NayaGram:AutoReplyKeepAlive");
+                    backgroundWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Bartalap:AutoReplyKeepAlive");
                     backgroundWakeLock.setReferenceCounted(false);
                 }
             }
@@ -163,7 +163,7 @@ public class AutoReplyManager {
             if (backgroundWifiLock == null) {
                 WifiManager wm = (WifiManager) ctx.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                 if (wm != null) {
-                    backgroundWifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "NayaGram:AutoReplyWifiLock");
+                    backgroundWifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Bartalap:AutoReplyWifiLock");
                     backgroundWifiLock.setReferenceCounted(false);
                 }
             }

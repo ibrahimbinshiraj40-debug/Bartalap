@@ -182,7 +182,7 @@ public class NGFrostShieldDialog {
 
             // Title
             TextView titleView = new TextView(context);
-            titleView.setText("NayaGram Frost Shield");
+            titleView.setText("Bartalap Frost Shield");
             titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             titleView.setTextColor(0xFF00E5FF);
             titleView.setTypeface(AndroidUtilities.bold());

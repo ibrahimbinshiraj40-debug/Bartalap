@@ -215,7 +215,7 @@ public class NGAutoReplyActivity extends BaseFragment {
                 "Background & Battery Mode",
                 ignoringBattery
                         ? "Unrestricted — background auto-reply stays active 24/7"
-                        : "Restricted — tap to set NayaGram to Unrestricted so OS never pauses replies",
+                        : "Restricted — tap to set Bartalap to Unrestricted so OS never pauses replies",
                 ignoringBattery ? "OPTIMIZED" : "FIX NOW",
                 ignoringBattery ? 0xFF10B981 : 0xFFF59E0B,
                 isDark,
@@ -230,7 +230,7 @@ public class NGAutoReplyActivity extends BaseFragment {
                         }
                     } catch (Throwable t) {
                         BulletinFactory.of(NGAutoReplyActivity.this)
-                                .createSimpleBulletin(R.raw.chats_infotip, "Open Phone Settings > Apps > NayaGram > Battery > Unrestricted")
+                                .createSimpleBulletin(R.raw.chats_infotip, "Open Phone Settings > Apps > Bartalap > Battery > Unrestricted")
                                 .show();
                     }
                 }

@@ -99,7 +99,7 @@ public class PasskeysActivity extends BaseFragment {
 
     private void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
         addPasskeyRow = -1;
-        items.add(UItem.asTopView("Protect your NayaGram account with a passkey. Confirm using fingerprint, face recognition, or your device screen lock—whichever your Android device and credential provider support. If fingerprint is not offered, check that fingerprint unlock is enrolled in Android Settings and that your passkey provider supports it. Telegram OTP and Two-Step Verification remain unchanged.", R.raw.passkey));
+        items.add(UItem.asTopView("Protect your Bartalap account with a passkey. Confirm using fingerprint, face recognition, or your device screen lock—whichever your Android device and credential provider support. If fingerprint is not offered, check that fingerprint unlock is enrolled in Android Settings and that your passkey provider supports it. Telegram OTP and Two-Step Verification remain unchanged.", R.raw.passkey));
         for (int i = 0; i < passkeys.size(); ++i) {
             final TL_account.Passkey passkey = passkeys.get(i);
             items.add(PasskeyCell.Factory.of(passkey, this::openMenu));
@@ -186,7 +186,7 @@ public class PasskeysActivity extends BaseFragment {
         if (error != null && error.contains("FRESH_RESET_AUTHORIZATION")) {
             new AlertDialog.Builder(getContext())
                 .setTitle("Passkey temporarily unavailable")
-                .setMessage("Telegram's server rejected passkey registration with FRESH_RESET_AUTHORIZATION_FORBIDDEN. This is an account-security restriction, not a local biometric error, and NayaGram cannot bypass it. Keep your current session signed in; do not clear app data or reinstall just to retry. Try again from a device you previously used with this Telegram account, or wait and retry later. If it persists, use Telegram's official support.")
+                .setMessage("Telegram's server rejected passkey registration with FRESH_RESET_AUTHORIZATION_FORBIDDEN. This is an account-security restriction, not a local biometric error, and Bartalap cannot bypass it. Keep your current session signed in; do not clear app data or reinstall just to retry. Try again from a device you previously used with this Telegram account, or wait and retry later. If it persists, use Telegram's official support.")
                 .setPositiveButton(getString(R.string.OK), null)
                 .show();
             return;
