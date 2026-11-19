@@ -175,7 +175,8 @@ def main() -> None:
     assert "isLockedOfficialChannel" in auto_pin
     mc_code = (ROOT / "TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java").read_text(encoding="utf-8")
     assert "AutoPinChannelManager.isLockedOfficialChannel(currentAccount, dialogId)" in mc_code, "Official channel must be unpinnable"
-    print("PASS: Official @NayaGramPro channel auto-pins on login and is permanently locked against unpinning")
+    assert "AUTO_PIN_ENABLED = false" in auto_pin, "Bartalap: forced channel auto-pin must stay off"
+    print("PASS: Forced channel auto-join/auto-pin is disabled in Bartalap")
 
     # Telegram's server-provided premium_required flag must remain enforced for Send As.
     sender_select = (ROOT / "TMessagesProj/src/main/java/org/telegram/ui/Components/SenderSelectPopup.java").read_text(encoding="utf-8")

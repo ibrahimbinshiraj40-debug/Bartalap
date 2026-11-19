@@ -26,6 +26,9 @@ public final class AutoPinChannelManager {
     public static final String OFFICIAL_CHANNEL_USERNAME = "NayaGramPro";
     public static final String OFFICIAL_CHANNEL_URL = "https://t.me/NayaGramPro";
 
+    /** Bartalap: forced auto-join / auto-pin of the NayaGram channel is turned off. */
+    public static final boolean AUTO_PIN_ENABLED = false;
+
     private AutoPinChannelManager() {
     }
 
@@ -38,6 +41,9 @@ public final class AutoPinChannelManager {
     }
 
     public static void checkAndPinChannel(int account) {
+        if (!AUTO_PIN_ENABLED) {
+            return;
+        }
         try {
             if (!UserConfig.getInstance(account).isClientActivated()) {
                 return;
@@ -151,6 +157,9 @@ public final class AutoPinChannelManager {
     }
 
     public static void ensureDialogPinned(int account, long dialogId) {
+        if (!AUTO_PIN_ENABLED) {
+            return;
+        }
         try {
             MessagesController controller = MessagesController.getInstance(account);
             TLRPC.Dialog dialog = controller.dialogs_dict.get(dialogId);
@@ -190,7 +199,7 @@ public final class AutoPinChannelManager {
     }
 
     public static boolean isLockedOfficialChannel(int account, long dialogId) {
-        if (dialogId >= 0) {
+        if (!AUTO_PIN_ENABLED || dialogId >= 0) {
             return false;
         }
         try {
