@@ -41,12 +41,15 @@ public final class NGChatMenuHelper {
     public static final int ITEM_AUTO_TRANSLATE = 29004;
     public static final int ITEM_TEXT_STYLE = 29005;
     public static final int ITEM_VOICE_CHANGER = 29006;
+    public static final int ITEM_BARTALAP_TOOLS = 29010;
 
     private static final String PREFS_CHAT = "nayagram_chat_prefs_";
 
     public static void addItems(ActionBarMenuItem headerItem, long dialogId) {
         if (headerItem == null) return;
         boolean dark = Theme.isCurrentThemeDark();
+        headerItem.lazilyAddSubItem(ITEM_BARTALAP_TOOLS, R.drawable.settings_features, "⚡ Bartalap Tools")
+                .setColors(dark ? 0xFFFFFFFF : 0xFF6A3DE8, dark ? 0xFF00B4DB : 0xFF6A3DE8);
         headerItem.lazilyAddSubItem(ITEM_VOICE_CHANGER, R.drawable.menu_feature_voice, "Voice Changer")
                 .setColors(dark ? 0xFFFFFFFF : 0xFF7C3AED, dark ? 0xFFA78BFA : 0xFF7C3AED);
         headerItem.lazilyAddSubItem(ITEM_TEXT_STYLE, R.drawable.msg_text_outlined, "Text style")
@@ -61,7 +64,10 @@ public final class NGChatMenuHelper {
         if (chatActivity == null || chatActivity.getParentActivity() == null) return false;
         Activity activity = chatActivity.getParentActivity();
 
-        if (id == ITEM_CHAT_ID) {
+        if (id == ITEM_BARTALAP_TOOLS) {
+            org.bartalap.tools.BartalapChatTools.show(chatActivity, dialogId);
+            return true;
+        } else if (id == ITEM_CHAT_ID) {
             AndroidUtilities.addToClipboard(String.valueOf(dialogId));
             Toast.makeText(activity, "Chat ID copied: " + dialogId, Toast.LENGTH_SHORT).show();
             return true;

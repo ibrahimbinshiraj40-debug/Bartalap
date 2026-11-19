@@ -287,9 +287,11 @@ public class BartalapToolsActivity extends BaseFragment {
     // ---------------------------------------------------------------- home
 
     private void buildHome(Context ctx) {
-        TextView intro = text(ctx, "Bartalap-এর নিজস্ব ফিচার। যেকোনোটায় চাপ দিন 👇", 14, false, grayColor());
+        TextView intro = text(ctx, "Bartalap-এর নিজস্ব ফিচার। যেকোনোটায় চাপ দিন 👇\nটিপস: যেকোনো চ্যাটে ⋮ → ⚡ Bartalap Tools থেকে Quick Reply, AI উত্তর, নোট সরাসরি পাবেন।", 14, false, grayColor());
         intro.setPadding(dp(4), dp(8), dp(4), dp(4));
         content.addView(intro);
+        content.addView(itemCard(ctx, "🤖 AI সেটিংস", "Claude বা Gemini API Key দিন। তারপর যেকোনো চ্যাটে ⋮ → ⚡ Bartalap Tools থেকে AI উত্তর আর সারাংশ পাবেন",
+                v -> BartalapChatTools.aiSettings(getParentActivity(), null), null));
         content.addView(itemCard(ctx, "📥 স্মার্ট ইনবক্স", "যাদের উত্তর দেননি, আর যাদের ফলো-আপ দরকার, আলাদা লিস্টে",
                 v -> presentFragment(new BartalapToolsActivity(MODE_INBOX)), null));
         content.addView(itemCard(ctx, "▶️ YouTube অটো পোস্ট", "আপনার YouTube চ্যানেলে নতুন ভিডিও এলে নিজে থেকে Telegram চ্যানেলে পোস্ট হবে",
