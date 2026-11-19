@@ -58,7 +58,7 @@ public final class BartalapReminders {
         }
     }
 
-    static void notify(Context ctx, int id, String title, String text, long openDialogId, int account) {
+    static void showNotification(Context ctx, int id, String title, String text, long openDialogId, int account) {
         try {
             ensureChannel(ctx);
             Intent intent = new Intent(ctx, LaunchActivity.class);
@@ -146,7 +146,7 @@ public final class BartalapReminders {
                     MessagesController.getInstance(account).addDialogToFolder(dialogId, 0, -1, 0);
                 }
             });
-            notify(getApplicationContext(), (int) (dialogId % 100000) + 5000, "⏰ স্নুজ শেষ",
+            showNotification(getApplicationContext(), (int) (dialogId % 100000) + 5000, "⏰ স্নুজ শেষ",
                     (name == null || name.isEmpty() ? "একটা চ্যাট" : name) + " এর চ্যাট আবার চ্যাট লিস্টে ফিরে এসেছে। এখন উত্তর দিন।",
                     dialogId, account);
             return Result.success();
@@ -223,7 +223,7 @@ public final class BartalapReminders {
                 if (UserConfig.getInstance(account).isClientActivated()) text[0] = buildDigest(account);
             });
             if (text[0] != null) {
-                notify(getApplicationContext(), 4242, "🌙 Bartalap আজকের সারাংশ", text[0], 0, account);
+                showNotification(getApplicationContext(), 4242, "🌙 Bartalap আজকের সারাংশ", text[0], 0, account);
             }
             return Result.success();
         }
