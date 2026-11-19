@@ -1,0 +1,38 @@
+name: Bartalap Quick Java Compile Check
+
+# Fast check (about 10-15 min) that the Java code compiles.
+# Runs on the "dev" branch so new features are checked before they go to master
+# (master runs the full 1+ hour APK build).
+
+on:
+  push:
+    branches: [ dev ]
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    env:
+      TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID || '0' }}
+      TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH || 'YOUR_TELEGRAM_API_HASH' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 1
+
+      - name: Fetch only the Java submodules needed for compiling
+        run: |
+          git submodule sync
+          git submodule update --init --depth 1 TMessagesProj_Modules/media TMessagesProj/lib/jlatexmath
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Compile Java (no native build)
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon :TMessagesProj:compileReleaseJavaWithJavac --stacktrace

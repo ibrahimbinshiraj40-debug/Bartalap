@@ -72,6 +72,7 @@ public class NGSettingsActivity extends BaseFragment {
     private RecyclerListView listView;
     private ListAdapter listAdapter;
 
+    private int rowBartalapTools = -1;
     private int headerStealth;
     private int rowVerifiedBadge;
     private int rowChannelVerifiedBadge;
@@ -132,6 +133,7 @@ public class NGSettingsActivity extends BaseFragment {
 
     private void updateRows() {
         rowCount = 0;
+        rowBartalapTools = rowCount++;
         headerStealth = rowCount++;
         rowRadiantOnlineAura = rowCount++;
         rowStealthOfflinePresence = rowCount++;
@@ -190,7 +192,7 @@ public class NGSettingsActivity extends BaseFragment {
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setAllowOverlayTitle(true);
-        actionBar.setTitle("NayaGram Settings");
+        actionBar.setTitle("Bartalap Settings");
         ActionBarMenu menu = actionBar.createMenu();
         ActionBarMenuItem overflowItem = menu.addItem(0, R.drawable.ic_ab_other);
         overflowItem.setIconColor(0xFF00D4FF);
@@ -442,6 +444,8 @@ public class NGSettingsActivity extends BaseFragment {
                     cell.setChecked(checked);
                     BulletinFactory.of(NGSettingsActivity.this).createSimpleBulletin(R.raw.done, "Save mobile data: " + (checked ? "On" : "Off")).show();
                 }
+            } else if (position == rowBartalapTools) {
+                presentFragment(new org.bartalap.tools.BartalapToolsActivity());
             } else if (position == rowStorageDoctor) {
                 runStorageDoctorScan();
             } else if (position == rowResetDefaults) {
@@ -815,7 +819,7 @@ public class NGSettingsActivity extends BaseFragment {
             if (position == headerStealth || position == headerMessaging || position == headerSecurity ||
                 position == headerOptimization || position == headerInternational || position == headerSystem) {
                 return 0; // Header
-            } else if (position == rowStorageDoctor || position == rowResetDefaults) {
+            } else if (position == rowStorageDoctor || position == rowResetDefaults || position == rowBartalapTools) {
                 return 2; // TextSettingsCell
             } else if (position == footerCopyrightRow) {
                 return 3; // Footer Info
@@ -953,7 +957,9 @@ public class NGSettingsActivity extends BaseFragment {
                 }
             } else if (type == 2) {
                 TextSettingsCell t = (TextSettingsCell) holder.itemView;
-                if (position == rowStorageDoctor) {
+                if (position == rowBartalapTools) {
+                    t.setText("✨ Bartalap Tools · নতুন ফিচার", true);
+                } else if (position == rowStorageDoctor) {
                     t.setText("🧹 Smart Storage Doctor", true);
                 } else if (position == rowResetDefaults) {
                     t.setText("Restore Defaults", true);
