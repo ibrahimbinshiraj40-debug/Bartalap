@@ -97,6 +97,7 @@ public final class BartalapChatTools {
                 "⌨️ বাংলিশে লিখে বাংলায় পাঠান",
                 "🤖 AI দিয়ে উত্তর লিখুন",
                 "🧾 AI দিয়ে চ্যাটের সারাংশ",
+                "✅ AI দিয়ে কাজের লিস্ট (কে কী কথা দিয়েছে)",
                 "📝 এই কন্টাক্টের নোট",
                 "💰 বাকির খাতায় যোগ করুন",
                 "😴 চ্যাট স্নুজ (পরে মনে করাবে)",
@@ -111,9 +112,10 @@ public final class BartalapChatTools {
                 case 2: banglish(chat); break;
                 case 3: aiReply(chat, dialogId); break;
                 case 4: aiSummary(chat, dialogId); break;
-                case 5: contactNote(chat, dialogId); break;
-                case 6: addToLedger(chat, dialogId); break;
-                case 7: snooze(chat, dialogId); break;
+                case 5: aiTasks(chat, dialogId); break;
+                case 6: contactNote(chat, dialogId); break;
+                case 7: addToLedger(chat, dialogId); break;
+                case 8: snooze(chat, dialogId); break;
                 default: aiSettings(a, null); break;
             }
         });
@@ -334,6 +336,17 @@ public final class BartalapChatTools {
         String system = "Summarize this Telegram chat in simple Bengali in 3-6 short bullet points. "
                 + "Mention any orders, payments, amounts, promises and pending tasks.";
         runAi(chat, "🧾 চ্যাটের সারাংশ", system, t, false);
+    }
+
+    private static void aiTasks(ChatActivity chat, long dialogId) {
+        String t = transcript(chat, dialogId, 80);
+        if (t.isEmpty()) {
+            toast("চ্যাটে কোনো লেখা মেসেজ নেই");
+            return;
+        }
+        String system = "From this Telegram chat, list in simple Bengali every promise, pending task, payment due and deadline. "
+                + "Format each line as: '• কে — কী করবে — কবে'. If nothing is pending, say 'কোনো বাকি কাজ নেই'.";
+        runAi(chat, "✅ কাজের লিস্ট", system, t, false);
     }
 
     public static void aiSettings(Activity a, Runnable after) {

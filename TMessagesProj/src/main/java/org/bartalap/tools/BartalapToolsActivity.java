@@ -70,6 +70,8 @@ public class BartalapToolsActivity extends BaseFragment {
     public static final int MODE_KEYWORDS = 8;
     public static final int MODE_YOUTUBE = 9;
     public static final int MODE_BEST_TIME = 10;
+    public static final int MODE_CROSSPOST = 11;
+    public static final int MODE_TRACKER = 12;
 
     private static final String PREFS = "bartalap_tools";
     private static final String KEY_TEMPLATES = "quick_replies";
@@ -266,6 +268,8 @@ public class BartalapToolsActivity extends BaseFragment {
             case MODE_KEYWORDS: return "অফার / কীওয়ার্ড খুঁজুন";
             case MODE_YOUTUBE: return "YouTube অটো পোস্ট";
             case MODE_BEST_TIME: return "পোস্ট করার সেরা সময়";
+            case MODE_CROSSPOST: return "এক পোস্ট সব জায়গায়";
+            case MODE_TRACKER: return "চ্যানেল ট্র্যাকার";
             default: return "Bartalap Tools";
         }
     }
@@ -283,6 +287,8 @@ public class BartalapToolsActivity extends BaseFragment {
             case MODE_KEYWORDS: buildKeywords(ctx); break;
             case MODE_YOUTUBE: buildYouTube(ctx); break;
             case MODE_BEST_TIME: buildBestTime(ctx); break;
+            case MODE_CROSSPOST: buildCrossPost(ctx); break;
+            case MODE_TRACKER: buildTracker(ctx); break;
             default: buildHome(ctx); break;
         }
     }
@@ -319,6 +325,10 @@ public class BartalapToolsActivity extends BaseFragment {
                 v -> presentFragment(new BartalapToolsActivity(MODE_INBOX)), null));
         content.addView(itemCard(ctx, "▶️ YouTube অটো পোস্ট", "আপনার YouTube চ্যানেলে নতুন ভিডিও এলে নিজে থেকে Telegram চ্যানেলে পোস্ট হবে",
                 v -> presentFragment(new BartalapToolsActivity(MODE_YOUTUBE)), null));
+        content.addView(itemCard(ctx, "🚀 এক পোস্ট সব জায়গায়", "একবার লিখে অনেকগুলো চ্যানেল আর গ্রুপে একসাথে পোস্ট করুন",
+                v -> presentFragment(new BartalapToolsActivity(MODE_CROSSPOST)), null));
+        content.addView(itemCard(ctx, "📈 চ্যানেল ট্র্যাকার", "নিজের বা প্রতিযোগীর পাবলিক চ্যানেলের সাবস্ক্রাইবার কত বাড়ছে দেখুন",
+                v -> presentFragment(new BartalapToolsActivity(MODE_TRACKER)), null));
         content.addView(itemCard(ctx, "📊 পোস্ট করার সেরা সময়", "আপনার Telegram চ্যানেলে কোন সময় আর কোন দিন পোস্ট করলে বেশি ভিউ আসে",
                 v -> presentFragment(new BartalapToolsActivity(MODE_BEST_TIME)), null));
         content.addView(itemCard(ctx, "🔗 লিংক ভল্ট", "সব চ্যাটে আসা লিংক এক জায়গায়: YouTube, Drive, Facebook, Telegram",
@@ -1322,6 +1332,214 @@ public class BartalapToolsActivity extends BaseFragment {
                 row.setTypeface(h == bestH ? Typeface.DEFAULT_BOLD : Typeface.MONOSPACE);
                 statsBox.addView(row);
             }
+        }));
+    }
+
+
+    // ---------------------------------------------------------------- cross post (one post, many chats)
+
+    private final ArrayList<Long> crossTargets = new ArrayList<>();
+
+    private void buildCrossPost(Context ctx) {
+        TextView intro = text(ctx, "একবার লিখুন, তারপর যতগুলো চ্যানেল/গ্রুপ চান বেছে নিন। এক চাপে সবগুলোতে পোস্ট হবে।", 14, false, grayColor());
+        intro.setLayoutParams(lp(8));
+        content.addView(intro);
+        EditText msg = input(ctx, "পোস্টের লেখা লিখুন…", true);
+        msg.setMinLines(5);
+        msg.setText(prefs().getString("crosspost_draft", ""));
+        msg.setLayoutParams(lp(10));
+        content.addView(msg);
+
+        MessagesController mc = MessagesController.getInstance(currentAccount);
+        ArrayList<Long> ids = new ArrayList<>();
+        ArrayList<String> names = new ArrayList<>();
+        for (TLRPC.Dialog d : new ArrayList<>(mc.getAllDialogs())) {
+            if (d == null || !DialogObject.isChatDialog(d.id)) continue;
+            TLRPC.Chat c = mc.getChat(-d.id);
+            if (c == null) continue;
+            boolean can = ChatObject.isChannelAndNotMegaGroup(c) ? ChatObject.canPost(c) : ChatObject.canSendMessages(c);
+            if (!can) continue;
+            ids.add(d.id);
+            names.add((ChatObject.isChannelAndNotMegaGroup(c) ? "📢 " : "👥 ") + c.title);
+        }
+        TextView pickTitle = text(ctx, "কোথায় কোথায় পোস্ট হবে (চাপ দিয়ে বেছে নিন):", 14, true, textColor());
+        pickTitle.setLayoutParams(lp(14));
+        content.addView(pickTitle);
+        if (ids.isEmpty()) {
+            content.addView(emptyText(ctx, "পোস্ট করার মতো কোনো চ্যানেল/গ্রুপ নেই।"));
+            return;
+        }
+        for (int i = 0; i < ids.size(); i++) {
+            final long id = ids.get(i);
+            final String name = names.get(i);
+            TextView row = text(ctx, (crossTargets.contains(id) ? "☑️ " : "⬜ ") + name, 16, false, textColor());
+            row.setPadding(dp(14), dp(12), dp(14), dp(12));
+            row.setBackground(card(cardColor()));
+            row.setLayoutParams(lp(6));
+            row.setOnClickListener(v -> {
+                if (crossTargets.contains(id)) crossTargets.remove(Long.valueOf(id)); else crossTargets.add(id);
+                ((TextView) v).setText((crossTargets.contains(id) ? "☑️ " : "⬜ ") + name);
+            });
+            content.addView(row);
+        }
+        Button send = button(ctx, "🚀 সব জায়গায় পোস্ট করুন", v -> {
+            String t = msg.getText().toString().trim();
+            if (t.isEmpty()) {
+                toast("লেখা দিন");
+                return;
+            }
+            if (crossTargets.isEmpty()) {
+                toast("অন্তত একটা চ্যানেল/গ্রুপ বেছে নিন");
+                return;
+            }
+            prefs().edit().putString("crosspost_draft", t).apply();
+            confirm("পোস্ট করবেন?", crossTargets.size() + " টা জায়গায় এই লেখাটা পোস্ট হবে।", () -> {
+                for (Long target : new ArrayList<>(crossTargets)) {
+                    org.telegram.messenger.SendMessagesHelper.getInstance(currentAccount)
+                            .sendMessage(org.telegram.messenger.SendMessagesHelper.SendMessageParams.of(t, target));
+                }
+                toast(crossTargets.size() + " টা জায়গায় পোস্ট হয়েছে ✅");
+                prefs().edit().putString("crosspost_draft", "").apply();
+            });
+        });
+        send.setLayoutParams(lp(16));
+        content.addView(send);
+    }
+
+    // ---------------------------------------------------------------- channel tracker (competitors)
+
+    private static final String KEY_TRACKED = "tracked_channels";
+
+    private void buildTracker(Context ctx) {
+        TextView intro = text(ctx, "যেকোনো পাবলিক চ্যানেলের (নিজের বা প্রতিযোগীর) সাবস্ক্রাইবার কত বাড়ছে বা কমছে দেখুন। যতবার খুলবেন, তত হিসাব জমবে।", 14, false, grayColor());
+        intro.setLayoutParams(lp(8));
+        content.addView(intro);
+        EditText un = input(ctx, "@username বা t.me/username", false);
+        un.setLayoutParams(lp(10));
+        content.addView(un);
+        Button add = button(ctx, "➕ ট্র্যাকিং-এ যোগ করুন", v -> {
+            String u = un.getText().toString().trim().replace("https://", "").replace("http://", "").replace("t.me/", "").replace("@", "");
+            if (u.contains("/")) u = u.substring(0, u.indexOf('/'));
+            if (u.isEmpty()) {
+                toast("username দিন");
+                return;
+            }
+            JSONArray arr = loadArray(KEY_TRACKED);
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject o = arr.optJSONObject(i);
+                if (o != null && u.equalsIgnoreCase(o.optString("username"))) {
+                    toast("আগেই যোগ করা আছে");
+                    return;
+                }
+            }
+            try {
+                arr.put(new JSONObject().put("username", u).put("history", new JSONArray()));
+            } catch (Exception ignored) {
+            }
+            saveArray(KEY_TRACKED, arr);
+            build(ctx);
+        });
+        add.setLayoutParams(lp(8));
+        content.addView(add);
+
+        JSONArray arr = loadArray(KEY_TRACKED);
+        if (arr.length() == 0) {
+            content.addView(emptyText(ctx, "এখনো কোনো চ্যানেল যোগ করা হয়নি।"));
+            return;
+        }
+        Button refresh = button(ctx, "🔄 সবগুলোর এখনকার সংখ্যা আনুন", v -> refreshTracked(ctx, 0));
+        refresh.setLayoutParams(lp(12));
+        content.addView(refresh);
+        for (int i = 0; i < arr.length(); i++) {
+            JSONObject o = arr.optJSONObject(i);
+            if (o == null) continue;
+            final int index = i;
+            String u = o.optString("username");
+            JSONArray h = o.optJSONArray("history");
+            String sub;
+            if (h == null || h.length() == 0) {
+                sub = "এখনো হিসাব নেওয়া হয়নি, রিফ্রেশ চাপুন";
+            } else {
+                JSONObject first = h.optJSONObject(0);
+                JSONObject last = h.optJSONObject(h.length() - 1);
+                int now = last.optInt("count");
+                int diff = now - first.optInt("count");
+                long days = Math.max(1, (last.optLong("time") - first.optLong("time")) / 86400000L);
+                sub = "👥 " + now + " সাবস্ক্রাইবার\n" + (diff >= 0 ? "📈 +" : "📉 ") + diff + " (" + days + " দিনে), শেষ চেক: " + last.optString("date");
+            }
+            content.addView(itemCard(ctx, "📢 " + o.optString("title", "@" + u), sub,
+                    v -> {
+                        try {
+                            Browser.openUrl(getParentActivity(), "https://t.me/" + u);
+                        } catch (Exception ignored) {
+                        }
+                    },
+                    v -> {
+                        confirm("ট্র্যাকিং থেকে সরাবেন?", "@" + u, () -> {
+                            saveArray(KEY_TRACKED, removeAt(loadArray(KEY_TRACKED), index));
+                            build(ctx);
+                        });
+                        return true;
+                    }));
+        }
+        if (!trackerAutoRefreshed) {
+            trackerAutoRefreshed = true;
+            refreshTracked(ctx, 0);
+        }
+    }
+
+    private boolean trackerAutoRefreshed = false;
+
+    private void refreshTracked(Context ctx, int index) {
+        JSONArray arr = loadArray(KEY_TRACKED);
+        if (index >= arr.length()) {
+            if (fragmentView != null && mode == MODE_TRACKER) build(ctx);
+            return;
+        }
+        JSONObject o = arr.optJSONObject(index);
+        if (o == null) {
+            refreshTracked(ctx, index + 1);
+            return;
+        }
+        String u = o.optString("username");
+        TLRPC.TL_contacts_resolveUsername req = new TLRPC.TL_contacts_resolveUsername();
+        req.username = u;
+        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+            if (!(response instanceof TLRPC.TL_contacts_resolvedPeer) || ((TLRPC.TL_contacts_resolvedPeer) response).chats.isEmpty()) {
+                refreshTracked(ctx, index + 1);
+                return;
+            }
+            TLRPC.TL_contacts_resolvedPeer rp = (TLRPC.TL_contacts_resolvedPeer) response;
+            MessagesController.getInstance(currentAccount).putChats(rp.chats, false);
+            MessagesController.getInstance(currentAccount).putUsers(rp.users, false);
+            TLRPC.Chat chat = rp.chats.get(0);
+            TLRPC.TL_channels_getFullChannel full = new TLRPC.TL_channels_getFullChannel();
+            full.channel = MessagesController.getInputChannel(chat);
+            ConnectionsManager.getInstance(currentAccount).sendRequest(full, (r2, e2) -> AndroidUtilities.runOnUIThread(() -> {
+                int count = chat.participants_count;
+                if (r2 instanceof TLRPC.TL_messages_chatFull && ((TLRPC.TL_messages_chatFull) r2).full_chat != null) {
+                    count = ((TLRPC.TL_messages_chatFull) r2).full_chat.participants_count;
+                }
+                if (count > 0) {
+                    try {
+                        JSONArray all = loadArray(KEY_TRACKED);
+                        JSONObject cur = all.optJSONObject(index);
+                        if (cur != null) {
+                            cur.put("title", chat.title);
+                            JSONArray h = cur.optJSONArray("history");
+                            if (h == null) h = new JSONArray();
+                            h.put(new JSONObject().put("count", count).put("time", System.currentTimeMillis())
+                                    .put("date", new SimpleDateFormat("dd/MM HH:mm", Locale.US).format(new Date())));
+                            while (h.length() > 200) h.remove(1);
+                            cur.put("history", h);
+                            all.put(index, cur);
+                            saveArray(KEY_TRACKED, all);
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+                refreshTracked(ctx, index + 1);
+            }));
         }));
     }
 
