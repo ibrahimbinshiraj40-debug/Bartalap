@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="AppName">নায়াগ্রাম</string>
-    <string name="AppNameBeta">নায়াগ্রাম বেটা</string>
+    <string name="AppName">Bartalap</string>
+    <string name="AppNameBeta">Bartalap Beta</string>
     <string name="LanguageName">বাংলা</string>
     <string name="English">ইংরেজি</string>
     <string name="LanguageNameInEnglish">Bengali</string>
