@@ -93,6 +93,7 @@ public final class BartalapChatTools {
         if (a == null) return;
         CharSequence[] items = {
                 "⚡ Quick Reply পাঠান",
+                "🎙️ লিখে বাংলা ভয়েস মেসেজ পাঠান",
                 "⌨️ বাংলিশে লিখে বাংলায় পাঠান",
                 "🤖 AI দিয়ে উত্তর লিখুন",
                 "🧾 AI দিয়ে চ্যাটের সারাংশ",
@@ -106,12 +107,13 @@ public final class BartalapChatTools {
         b.setItems(items, (d, which) -> {
             switch (which) {
                 case 0: quickReply(chat, dialogId); break;
-                case 1: banglish(chat); break;
-                case 2: aiReply(chat, dialogId); break;
-                case 3: aiSummary(chat, dialogId); break;
-                case 4: contactNote(chat, dialogId); break;
-                case 5: addToLedger(chat, dialogId); break;
-                case 6: snooze(chat, dialogId); break;
+                case 1: voiceNote(chat, dialogId); break;
+                case 2: banglish(chat); break;
+                case 3: aiReply(chat, dialogId); break;
+                case 4: aiSummary(chat, dialogId); break;
+                case 5: contactNote(chat, dialogId); break;
+                case 6: addToLedger(chat, dialogId); break;
+                case 7: snooze(chat, dialogId); break;
                 default: aiSettings(a, null); break;
             }
         });
@@ -143,6 +145,68 @@ public final class BartalapChatTools {
         b.setItems(list, (d, which) -> putInInput(chat, list[which].toString()));
         b.setNegativeButton("বন্ধ", null);
         b.setNeutralButton("টেমপ্লেট এডিট", (d, w) -> chat.presentFragment(new BartalapToolsActivity(BartalapToolsActivity.MODE_QUICK_REPLY)));
+        chat.showDialog(b.create());
+    }
+
+    // ------------------------------------------------------------ text to voice
+
+    private static boolean hasLatin(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) return true;
+        }
+        return false;
+    }
+
+    private static void voiceNote(ChatActivity chat, long dialogId) {
+        Activity a = chat.getParentActivity();
+        LinearLayout box = new LinearLayout(a);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setPadding(dp(20), dp(8), dp(20), dp(8));
+        EditText in = new EditText(a);
+        in.setHint("বাংলায় লিখুন (বা বাংলিশে: ami ashchi)");
+        in.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        in.setMinLines(3);
+        TextView info = new TextView(a);
+        info.setTextSize(12.5f);
+        info.setPadding(0, dp(8), 0, 0);
+        info.setText("ফোনের Google Text-to-Speech-এর বাংলা কণ্ঠে ভয়েস মেসেজ বানিয়ে পাঠাবে।");
+        final float[] speed = {prefs().getFloat("voice_speed", 1.0f)};
+        TextView speedBtn = new TextView(a);
+        speedBtn.setTextSize(15);
+        speedBtn.setPadding(0, dp(10), 0, 0);
+        speedBtn.setText("গতি: " + speed[0] + "x (চাপ দিয়ে বদলান)");
+        speedBtn.setOnClickListener(v -> {
+            speed[0] = speed[0] >= 1.4f ? 0.8f : Math.round((speed[0] + 0.1f) * 10f) / 10f;
+            speedBtn.setText("গতি: " + speed[0] + "x (চাপ দিয়ে বদলান)");
+        });
+        box.addView(in);
+        box.addView(speedBtn);
+        box.addView(info);
+        AlertDialog.Builder b = new AlertDialog.Builder(a);
+        b.setTitle("🎙️ লিখে ভয়েস পাঠান");
+        b.setView(box);
+        b.setNegativeButton("বাতিল", null);
+        b.setPositiveButton("ভয়েস পাঠান", (d, w) -> {
+            String t = in.getText().toString().trim();
+            if (t.isEmpty()) {
+                toast("কিছু লিখুন");
+                return;
+            }
+            if (hasLatin(t)) t = BanglishConverter.convert(t);
+            prefs().edit().putFloat("voice_speed", speed[0]).apply();
+            toast("ভয়েস তৈরি হচ্ছে… ⏳");
+            VoiceNoteMaker.makeAndSend(chat.getCurrentAccount(), dialogId, t, speed[0], 1.0f, (ok, error) -> {
+                if (ok) toast("ভয়েস মেসেজ পাঠানো হয়েছে ✅");
+                else if (chat.getParentActivity() != null) {
+                    AlertDialog.Builder eb = new AlertDialog.Builder(chat.getParentActivity());
+                    eb.setTitle("⚠️ ভয়েস পাঠানো যায়নি");
+                    eb.setMessage(error);
+                    eb.setPositiveButton("ঠিক আছে", null);
+                    eb.show();
+                }
+            });
+        });
         chat.showDialog(b.create());
     }
 
