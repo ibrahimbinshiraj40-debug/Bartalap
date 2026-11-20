@@ -48,7 +48,7 @@ public final class NGChatMenuHelper {
     public static void addItems(ActionBarMenuItem headerItem, long dialogId) {
         if (headerItem == null) return;
         boolean dark = Theme.isCurrentThemeDark();
-        headerItem.lazilyAddSubItem(ITEM_BARTALAP_TOOLS, R.drawable.settings_features, "⚡ Bartalap Tools")
+        headerItem.lazilyAddSubItem(ITEM_BARTALAP_TOOLS, R.drawable.settings_features, "Bartalap Tools")
                 .setColors(dark ? 0xFFFFFFFF : 0xFF6A3DE8, dark ? 0xFF00B4DB : 0xFF6A3DE8);
         headerItem.lazilyAddSubItem(ITEM_VOICE_CHANGER, R.drawable.menu_feature_voice, "Voice Changer")
                 .setColors(dark ? 0xFFFFFFFF : 0xFF7C3AED, dark ? 0xFFA78BFA : 0xFF7C3AED);

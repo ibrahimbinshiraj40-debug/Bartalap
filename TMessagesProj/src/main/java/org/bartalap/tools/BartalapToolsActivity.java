@@ -127,13 +127,22 @@ public class BartalapToolsActivity extends BaseFragment {
         try {
             ClipboardManager cm = (ClipboardManager) ApplicationLoader.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE);
             cm.setPrimaryClip(ClipData.newPlainText("bartalap", text));
-            toast("কপি হয়েছে ✅");
+            toast("কপি হয়েছে ");
         } catch (Exception ignored) {
         }
     }
 
     private void toast(String s) {
-        Toast.makeText(ApplicationLoader.applicationContext, s, Toast.LENGTH_SHORT).show();
+        Toast.makeText(ApplicationLoader.applicationContext, BartalapIcons.clean(s), Toast.LENGTH_SHORT).show();
+    }
+
+    private static String cleanTitle(String t) {
+        return BartalapIcons.clean(t);
+    }
+
+    private static CharSequence[] cleanItems(CharSequence[] items) {
+        for (int i = 0; i < items.length; i++) items[i] = BartalapIcons.clean(items[i].toString());
+        return items;
     }
 
     private int dp(float v) {
@@ -149,7 +158,7 @@ public class BartalapToolsActivity extends BaseFragment {
 
     private TextView text(Context ctx, String s, float size, boolean bold, int color) {
         TextView t = new TextView(ctx);
-        t.setText(s);
+        t.setText(bold ? BartalapIcons.clean(s) : s);
         t.setTextSize(size);
         t.setTextColor(color);
         if (bold) t.setTypeface(Typeface.DEFAULT_BOLD);
@@ -180,7 +189,18 @@ public class BartalapToolsActivity extends BaseFragment {
 
     private Button button(Context ctx, String label, View.OnClickListener l) {
         Button b = new Button(ctx);
-        b.setText(label);
+        String[] parts = BartalapIcons.split(label);
+        b.setText(BartalapIcons.clean(label));
+        if (!parts[0].isEmpty()) {
+            BartalapIcons.Icon ic = BartalapIcons.iconFor(parts[0]);
+            android.graphics.drawable.Drawable d = BartalapIcons.tinted(ctx, ic.res, 0xFFFFFFFF);
+            int sz = dp(22);
+            d.setBounds(0, 0, sz, sz);
+            b.setCompoundDrawables(d, null, null, null);
+            b.setCompoundDrawablePadding(dp(8));
+            b.setPadding(dp(18), 0, dp(18), 0);
+            b.setGravity(Gravity.CENTER);
+        }
         b.setAllCaps(false);
         b.setTextColor(0xFFFFFFFF);
         b.setTextSize(15);
@@ -210,26 +230,36 @@ public class BartalapToolsActivity extends BaseFragment {
     }
 
     private View itemCard(Context ctx, String title, String sub, View.OnClickListener click, View.OnLongClickListener longClick) {
+        String[] parts = BartalapIcons.split(title);
+        LinearLayout row = new LinearLayout(ctx);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(14), dp(14), dp(16), dp(14));
+        row.setBackground(card(cardColor()));
+        if (!parts[0].isEmpty()) {
+            LinearLayout.LayoutParams ip = new LinearLayout.LayoutParams(dp(38), dp(38));
+            ip.rightMargin = dp(14);
+            row.addView(BartalapIcons.badge(ctx, BartalapIcons.iconFor(parts[0])), ip);
+        }
         LinearLayout box = new LinearLayout(ctx);
         box.setOrientation(LinearLayout.VERTICAL);
-        box.setPadding(dp(16), dp(14), dp(16), dp(14));
-        box.setBackground(card(cardColor()));
-        box.addView(text(ctx, title, 16, true, textColor()));
+        box.addView(text(ctx, parts[1], 16, true, textColor()));
         if (sub != null && !sub.isEmpty()) {
             TextView s = text(ctx, sub, 13.5f, false, grayColor());
             s.setPadding(0, dp(4), 0, 0);
             box.addView(s);
         }
-        if (click != null) box.setOnClickListener(click);
-        if (longClick != null) box.setOnLongClickListener(longClick);
-        box.setLayoutParams(lp(10));
-        return box;
+        row.addView(box, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        if (click != null) row.setOnClickListener(click);
+        if (longClick != null) row.setOnLongClickListener(longClick);
+        row.setLayoutParams(lp(10));
+        return row;
     }
 
     private void confirm(String title, String msg, Runnable yes) {
         if (getParentActivity() == null) return;
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle(title);
+        b.setTitle(cleanTitle(title));
         b.setMessage(msg);
         b.setNegativeButton("না", null);
         b.setPositiveButton("হ্যাঁ", (d, w) -> yes.run());
@@ -320,11 +350,11 @@ public class BartalapToolsActivity extends BaseFragment {
     // ---------------------------------------------------------------- home
 
     private void buildHome(Context ctx) {
-        TextView intro = text(ctx, "Bartalap-এর নিজস্ব ফিচার। যেকোনোটায় চাপ দিন 👇\nটিপস: যেকোনো চ্যাটে ⋮ → ⚡ Bartalap Tools থেকে Quick Reply, AI উত্তর, নোট সরাসরি পাবেন।", 14, false, grayColor());
+        TextView intro = text(ctx, "Bartalap-এর নিজস্ব ফিচার। যেকোনোটায় চাপ দিন \nটিপস: যেকোনো চ্যাটে ⋮ → Bartalap Tools থেকে Quick Reply, AI উত্তর, নোট সরাসরি পাবেন।", 14, false, grayColor());
         intro.setPadding(dp(4), dp(8), dp(4), dp(4));
         content.addView(intro);
         boolean aiOn = org.telegram.messenger.BartalapAiAutoReply.isEnabled();
-        content.addView(itemCard(ctx, "🤖 AI অটো-রিপ্লাই: " + (aiOn ? "চালু ✅" : "বন্ধ"),
+        content.addView(itemCard(ctx, "🤖 AI অটো-রিপ্লাই: " + (aiOn ? "চালু " : "বন্ধ"),
                 "আপনি অফলাইনে থাকলে Claude আপনার মতো করে সবার মেসেজের উত্তর দেবে, কখনো লিখে কখনো ভয়েসে। চালু/বন্ধ আর সেটিংস এখানে",
                 v -> presentFragment(new BartalapToolsActivity(MODE_AI_AUTO)), null));
         content.addView(itemCard(ctx, "📲 ইউনিফাইড ইনবক্স (WhatsApp, Messenger…)", "WhatsApp, Messenger, Instagram, IMO-র মেসেজ এখানে। কেউ ডিলিট করলেও দেখবেন, এখান থেকেই রিপ্লাই",
@@ -333,14 +363,14 @@ public class BartalapToolsActivity extends BaseFragment {
                 v -> presentFragment(new BartalapToolsActivity(MODE_PRIORITY)), null));
         content.addView(ghostCard(ctx));
         boolean nsOn = BartalapAudio.isNoiseFilterEnabled();
-        content.addView(itemCard(ctx, "🎙 ভয়েস মেসেজে নয়েজ কমানো: " + (nsOn ? "চালু ✅" : "বন্ধ"),
+        content.addView(itemCard(ctx, "🎙 ভয়েস মেসেজে নয়েজ কমানো: " + (nsOn ? "চালু " : "বন্ধ"),
                 "রেকর্ড করা ভয়েসের পেছনের শব্দ কমাবে আর আওয়াজ ঠিক রাখবে। চাপ দিয়ে চালু/বন্ধ করুন",
                 v -> {
                     BartalapAudio.setNoiseFilterEnabled(!BartalapAudio.isNoiseFilterEnabled());
                     build(ctx);
                 }, null));
         boolean digestOn = BartalapReminders.isDigestEnabled();
-        content.addView(itemCard(ctx, "🌙 ডেইলি ডাইজেস্ট: " + (digestOn ? "চালু ✅" : "বন্ধ"),
+        content.addView(itemCard(ctx, "🌙 ডেইলি ডাইজেস্ট: " + (digestOn ? "চালু " : "বন্ধ"),
                 "প্রতিদিন রাত ৯টায় একটা নোটিফিকেশন: কতগুলো মেসেজ পড়া হয়নি, কার উত্তর বাকি। চাপ দিয়ে চালু/বন্ধ করুন",
                 v -> {
                     boolean on = !BartalapReminders.isDigestEnabled();
@@ -349,7 +379,7 @@ public class BartalapToolsActivity extends BaseFragment {
                         String now = BartalapReminders.buildDigest(currentAccount);
                         if (getParentActivity() != null) {
                             AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-                            b.setTitle("চালু হয়েছে ✅ আজকের নমুনা:");
+                            b.setTitle(cleanTitle("চালু হয়েছে আজকের নমুনা:"));
                             b.setMessage(now);
                             b.setPositiveButton("ঠিক আছে", null);
                             showDialog(b.create());
@@ -359,7 +389,7 @@ public class BartalapToolsActivity extends BaseFragment {
                     }
                     build(ctx);
                 }, null));
-        content.addView(itemCard(ctx, "🤖 AI সেটিংস", "Claude বা Gemini API Key দিন। তারপর যেকোনো চ্যাটে ⋮ → ⚡ Bartalap Tools থেকে AI উত্তর আর সারাংশ পাবেন",
+        content.addView(itemCard(ctx, "🤖 AI সেটিংস", "Claude বা Gemini API Key দিন। তারপর যেকোনো চ্যাটে ⋮ → Bartalap Tools থেকে AI উত্তর আর সারাংশ পাবেন",
                 v -> BartalapChatTools.aiSettings(getParentActivity(), null), null));
         content.addView(itemCard(ctx, "📥 স্মার্ট ইনবক্স", "যাদের উত্তর দেননি, আর যাদের ফলো-আপ দরকার, আলাদা লিস্টে",
                 v -> presentFragment(new BartalapToolsActivity(MODE_INBOX)), null));
@@ -444,7 +474,7 @@ public class BartalapToolsActivity extends BaseFragment {
         if (arr.length() == 0 && !prefs().getBoolean("templates_seeded", false)) {
             arr.put("আসসালামু আলাইকুম {নাম} ভাই, কিভাবে সাহায্য করতে পারি?");
             arr.put("{নাম} ভাই, পেমেন্ট করুন bKash/Nagad: 01XXXXXXXXX (Send Money). পেমেন্ট করে TrxID দিন।");
-            arr.put("ধন্যবাদ {নাম} ভাই, আপনার অর্ডার কনফার্ম হয়েছে ✅");
+            arr.put("ধন্যবাদ {নাম} ভাই, আপনার অর্ডার কনফার্ম হয়েছে ");
             saveArray(KEY_TEMPLATES, arr);
             prefs().edit().putBoolean("templates_seeded", true).apply();
         }
@@ -478,7 +508,7 @@ public class BartalapToolsActivity extends BaseFragment {
         EditText nameIn = input(getParentActivity(), "নাম লিখুন", false);
         nameIn.setPadding(dp(20), dp(10), dp(20), dp(10));
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle("কার জন্য?");
+        b.setTitle(cleanTitle("কার জন্য?"));
         b.setView(nameIn);
         b.setNegativeButton("বাতিল", null);
         b.setPositiveButton("কপি", (d, w) -> copy(fillTemplate(template, nameIn.getText().toString())));
@@ -488,8 +518,8 @@ public class BartalapToolsActivity extends BaseFragment {
     private void templateMenu(int index, String t) {
         if (getParentActivity() == null) return;
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle("টেমপ্লেট");
-        b.setItems(new CharSequence[]{"✏️ এডিট", "🗑 ডিলিট"}, (d, which) -> {
+        b.setTitle(cleanTitle("টেমপ্লেট"));
+        b.setItems(cleanItems(new CharSequence[]{"✏️ এডিট", "🗑 ডিলিট"}), (d, which) -> {
             if (which == 0) {
                 editTemplate(index, t);
             } else {
@@ -508,7 +538,7 @@ public class BartalapToolsActivity extends BaseFragment {
         e.setText(current);
         e.setPadding(dp(20), dp(10), dp(20), dp(10));
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle(index < 0 ? "নতুন টেমপ্লেট" : "টেমপ্লেট এডিট");
+        b.setTitle(cleanTitle(index < 0 ? "নতুন টেমপ্লেট" : "টেমপ্লেট এডিট"));
         b.setView(e);
         b.setNegativeButton("বাতিল", null);
         b.setPositiveButton("সেভ", (d, w) -> {
@@ -589,7 +619,7 @@ public class BartalapToolsActivity extends BaseFragment {
         box.addView(nameIn);
         box.addView(noteIn);
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle(index < 0 ? "নতুন নোট" : "নোট এডিট");
+        b.setTitle(cleanTitle(index < 0 ? "নতুন নোট" : "নোট এডিট"));
         b.setView(box);
         b.setNegativeButton("বাতিল", null);
         b.setPositiveButton("সেভ", (d, w) -> {
@@ -661,7 +691,7 @@ public class BartalapToolsActivity extends BaseFragment {
             final int index = i;
             final JSONObject item = o;
             String sub = (o.optString("note").isEmpty() ? "" : o.optString("note") + "\n") + o.optString("date");
-            content.addView(itemCard(ctx, "👤 " + o.optString("name") + "   ৳ " + formatAmount(o.optDouble("amount", 0)), sub,
+            content.addView(itemCard(ctx, "👤 " + o.optString("name") + " ৳ " + formatAmount(o.optDouble("amount", 0)), sub,
                     v -> ledgerMenu(index, item), null));
         }
     }
@@ -671,8 +701,8 @@ public class BartalapToolsActivity extends BaseFragment {
         String name = o.optString("name");
         String amount = formatAmount(o.optDouble("amount", 0));
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle(name + " · ৳ " + amount);
-        b.setItems(new CharSequence[]{"✅ পরিশোধ হয়েছে (মুছে ফেলুন)", "✏️ এডিট", "📋 রিমাইন্ডার মেসেজ কপি"}, (d, which) -> {
+        b.setTitle(cleanTitle(name + " · ৳ " + amount));
+        b.setItems(cleanItems(new CharSequence[]{"✅ পরিশোধ হয়েছে (মুছে ফেলুন)", "✏️ এডিট", "📋 রিমাইন্ডার মেসেজ কপি"}), (d, which) -> {
             if (which == 0) {
                 confirm("পরিশোধ হয়েছে?", name + " এর ৳ " + amount + " খাতা থেকে মুছে যাবে।", () -> {
                     saveArray(KEY_LEDGER, removeAt(loadArray(KEY_LEDGER), index));
@@ -705,7 +735,7 @@ public class BartalapToolsActivity extends BaseFragment {
         box.addView(amountIn);
         box.addView(noteIn);
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle(index < 0 ? "নতুন বাকি" : "এডিট");
+        b.setTitle(cleanTitle(index < 0 ? "নতুন বাকি" : "এডিট"));
         b.setView(box);
         b.setNegativeButton("বাতিল", null);
         b.setPositiveButton("সেভ", (d, w) -> {
@@ -796,7 +826,7 @@ public class BartalapToolsActivity extends BaseFragment {
     }
 
     private TextView emptyText(Context ctx, String s) {
-        TextView t = text(ctx, s, 14, false, grayColor());
+        TextView t = text(ctx, BartalapIcons.clean(s), 14, false, grayColor());
         t.setGravity(Gravity.CENTER);
         t.setPadding(dp(8), dp(24), dp(8), dp(24));
         return t;
@@ -861,13 +891,13 @@ public class BartalapToolsActivity extends BaseFragment {
         content.addView(count);
 
         if (found.isEmpty()) {
-            content.addView(emptyText(ctx, inboxShowFollowUp ? "কোনো ফলো-আপ বাকি নেই 🎉" : "সব মেসেজের উত্তর দেওয়া হয়েছে 🎉"));
+            content.addView(emptyText(ctx, inboxShowFollowUp ? "কোনো ফলো-আপ বাকি নেই " : "সব মেসেজের উত্তর দেওয়া হয়েছে "));
             return;
         }
         for (MessageObject m : found) {
             final long did = m.getDialogId();
             String snippet = (inboxShowFollowUp ? "আপনি: " : "") + shorten(m.messageText, 90);
-            content.addView(itemCard(ctx, "👤 " + dialogName(did) + "  ·  " + timeAgo(m.messageOwner.date), snippet,
+            content.addView(itemCard(ctx, "👤 " + dialogName(did) + " · " + timeAgo(m.messageOwner.date), snippet,
                     v -> openChat(did, 0), null));
         }
     }
@@ -958,8 +988,8 @@ public class BartalapToolsActivity extends BaseFragment {
     private void linkMenu(LinkItem item) {
         if (getParentActivity() == null) return;
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle(item.category);
-        b.setItems(new CharSequence[]{"📋 লিংক কপি", "💬 যে চ্যাটে এসেছে সেখানে যান"}, (d, which) -> {
+        b.setTitle(cleanTitle(item.category));
+        b.setItems(cleanItems(new CharSequence[]{"📋 লিংক কপি", "💬 যে চ্যাটে এসেছে সেখানে যান"}), (d, which) -> {
             if (which == 0) copy(item.url);
             else openChat(item.dialogId, item.messageId);
         });
@@ -1064,7 +1094,7 @@ public class BartalapToolsActivity extends BaseFragment {
             }
         }
         boolean alertOn = KeywordAlertWorker.isEnabled();
-        View alertCard = itemCard(ctx, "🔔 নতুন পোস্টে নোটিফিকেশন: " + (alertOn ? "চালু ✅" : "বন্ধ"),
+        View alertCard = itemCard(ctx, "🔔 নতুন পোস্টে নোটিফিকেশন: " + (alertOn ? "চালু " : "বন্ধ"),
                 "সেভ করা শব্দগুলো নিয়ে কেউ নতুন পোস্ট দিলে প্রতি ৩০ মিনিটে চেক করে নোটিফিকেশন দেবে। চাপ দিয়ে চালু/বন্ধ করুন",
                 v -> {
                     if (!KeywordAlertWorker.isEnabled() && loadArray(KEY_KEYWORDS).length() == 0) {
@@ -1072,7 +1102,7 @@ public class BartalapToolsActivity extends BaseFragment {
                         return;
                     }
                     KeywordAlertWorker.setEnabled(!KeywordAlertWorker.isEnabled());
-                    toast(KeywordAlertWorker.isEnabled() ? "নোটিফিকেশন চালু ✅" : "নোটিফিকেশন বন্ধ");
+                    toast(KeywordAlertWorker.isEnabled() ? "নোটিফিকেশন চালু " : "নোটিফিকেশন বন্ধ");
                     build(ctx);
                 }, null);
         content.addView(alertCard);
@@ -1108,7 +1138,7 @@ public class BartalapToolsActivity extends BaseFragment {
                 if (m == null) continue;
                 final long did = MessageObject.getPeerId(m.peer_id);
                 final int mid = m.id;
-                results.addView(itemCard(ctx, dialogName(did) + "  ·  " + timeAgo(m.date), shorten(m.message, 160),
+                results.addView(itemCard(ctx, dialogName(did) + " · " + timeAgo(m.date), shorten(m.message, 160),
                         v -> openChat(did, mid), null));
             }
         }));
@@ -1190,7 +1220,7 @@ public class BartalapToolsActivity extends BaseFragment {
                             .apply();
                     YouTubeAutoPostWorker.schedule(ApplicationLoader.applicationContext);
                     new Thread(() -> YouTubeAutoPostWorker.checkNow(false)).start();
-                    toast("চালু হয়েছে ✅ এখন থেকে নতুন ভিডিও এলে পোস্ট হবে");
+                    toast("চালু হয়েছে এখন থেকে নতুন ভিডিও এলে পোস্ট হবে");
                     if (getParentActivity() != null) build(getParentActivity());
                 });
             }).start();
@@ -1201,7 +1231,7 @@ public class BartalapToolsActivity extends BaseFragment {
         Button test = button(ctx, "🧪 টেস্ট: সর্বশেষ ভিডিওটা এখনই পোস্ট করুন", v -> confirm("টেস্ট পোস্ট",
                 "আপনার চ্যানেলের সর্বশেষ ভিডিওটা এখনই " + (targetName.isEmpty() ? "বেছে নেওয়া চ্যানেলে" : targetName + " এ") + " পোস্ট হবে।", () -> new Thread(() -> {
                     int r = YouTubeAutoPostWorker.checkNow(true);
-                    AndroidUtilities.runOnUIThread(() -> toast(r == YouTubeAutoPostWorker.RESULT_POSTED ? "পোস্ট হয়েছে ✅"
+                    AndroidUtilities.runOnUIThread(() -> toast(r == YouTubeAutoPostWorker.RESULT_POSTED ? "পোস্ট হয়েছে "
                             : r == YouTubeAutoPostWorker.RESULT_NOT_SET_UP ? "আগে সেভ করে চালু করুন" : "ভিডিও পাওয়া যায়নি বা ইন্টারনেট সমস্যা"));
                 }).start()));
         test.setLayoutParams(lp(10));
@@ -1243,7 +1273,7 @@ public class BartalapToolsActivity extends BaseFragment {
             return;
         }
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle("কোথায় পোস্ট হবে?");
+        b.setTitle(cleanTitle("কোথায় পোস্ট হবে?"));
         b.setItems(names.toArray(new CharSequence[0]), (dlg, which) -> {
             YouTubeAutoPostWorker.prefs().edit()
                     .putLong(YouTubeAutoPostWorker.KEY_TARGET_DIALOG, ids.get(which))
@@ -1290,7 +1320,7 @@ public class BartalapToolsActivity extends BaseFragment {
             return;
         }
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle("কোন চ্যানেল?");
+        b.setTitle(cleanTitle("কোন চ্যানেল?"));
         b.setItems(names.toArray(new CharSequence[0]), (dlg, which) -> loadChannelStats(ctx, ids.get(which), names.get(which).toString()));
         showDialog(b.create());
     }
@@ -1476,7 +1506,7 @@ public class BartalapToolsActivity extends BaseFragment {
                     org.telegram.messenger.SendMessagesHelper.getInstance(currentAccount)
                             .sendMessage(org.telegram.messenger.SendMessagesHelper.SendMessageParams.of(t, target));
                 }
-                toast(crossTargets.size() + " টা জায়গায় পোস্ট হয়েছে ✅");
+                toast(crossTargets.size() + " টা জায়গায় পোস্ট হয়েছে ");
                 prefs().edit().putString("crosspost_draft", "").apply();
             });
         });
@@ -1723,7 +1753,7 @@ public class BartalapToolsActivity extends BaseFragment {
             JSONObject o = e.getValue();
             final String pkg = o.optString("pkg"), chat = o.optString("chat");
             String sub = (o.optBoolean("deleted") ? "🗑 " : "") + shorten(o.optString("text"), 90) + "\n" + clock(o.optLong("time")) + " · " + counts.get(e.getKey()) + " টি মেসেজ";
-            content.addView(itemCard(ctx, "💬 " + chat + "  ·  " + BartalapNotificationListener.appName(pkg), sub,
+            content.addView(itemCard(ctx, "💬 " + chat + " · " + BartalapNotificationListener.appName(pkg), sub,
                     v -> presentFragment(unifiedChat(pkg, chat)), null));
         }
         Button clear = button(ctx, "🧹 সব মুছে ফেলুন", v -> confirm("সব মুছবেন?", "ইউনিফাইড ইনবক্সের সব জমা মেসেজ মুছে যাবে।", () -> {
@@ -1744,7 +1774,7 @@ public class BartalapToolsActivity extends BaseFragment {
             if (o == null || !uPkg.equals(o.optString("pkg")) || !uChat.equals(o.optString("chat"))) continue;
             boolean out = o.optBoolean("out");
             TextView bubble = text(ctx, (out ? "" : o.optString("sender") + "\n") + o.optString("text")
-                    + (o.optBoolean("deleted") ? "\n🗑 পাঠানো ব্যক্তি এটা ডিলিট করেছে" : "") + "\n" + clock(o.optLong("time")), 15, false,
+                    + (o.optBoolean("deleted") ? "\n পাঠানো ব্যক্তি এটা ডিলিট করেছে" : "") + "\n" + clock(o.optLong("time")), 15, false,
                     out ? 0xFFFFFFFF : textColor());
             bubble.setTextIsSelectable(true);
             bubble.setPadding(dp(14), dp(10), dp(14), dp(10));
@@ -1800,7 +1830,7 @@ public class BartalapToolsActivity extends BaseFragment {
                 }
                 if (latin && prefs().getBoolean("unified_banglish", false)) t = BanglishConverter.convert(t);
                 if (BartalapNotificationListener.reply(ctx, uPkg, uChat, t)) {
-                    toast("পাঠানো হয়েছে ✅");
+                    toast("পাঠানো হয়েছে ");
                     build(ctx);
                 } else {
                     toast("পাঠানো যায়নি, অ্যাপ খুলে উত্তর দিন");
@@ -1827,11 +1857,11 @@ public class BartalapToolsActivity extends BaseFragment {
 
     private View ghostCard(Context ctx) {
         boolean on = org.telegram.messenger.NayoGramFeatures.isGhostModeEnabled();
-        return itemCard(ctx, "👻 সিন না দিয়ে পড়া: " + (on ? "চালু ✅" : "বন্ধ"),
+        return itemCard(ctx, "👻 সিন না দিয়ে পড়া: " + (on ? "চালু " : "বন্ধ"),
                 "চালু থাকলে প্রাইভেট চ্যাটে মেসেজ পড়লেও অন্যজন ব্লু টিক/Seen দেখবে না, আর আপনার typing… দেখাবে না। চাপ দিয়ে চালু/বন্ধ করুন",
                 v -> {
                     org.telegram.messenger.NayoGramFeatures.setGhostModeEnabled(!org.telegram.messenger.NayoGramFeatures.isGhostModeEnabled());
-                    toast(org.telegram.messenger.NayoGramFeatures.isGhostModeEnabled() ? "সিন না দিয়ে পড়া চালু ✅" : "বন্ধ হয়েছে");
+                    toast(org.telegram.messenger.NayoGramFeatures.isGhostModeEnabled() ? "সিন না দিয়ে পড়া চালু " : "বন্ধ হয়েছে");
                     build(ctx);
                 }, null);
     }
@@ -1871,7 +1901,7 @@ public class BartalapToolsActivity extends BaseFragment {
         }
         Collections.sort(list, (a, b) -> Integer.compare((Integer) b[0], (Integer) a[0]));
         if (list.isEmpty()) {
-            content.addView(emptyText(ctx, "এই মুহূর্তে জরুরি কিছু নেই 🎉"));
+            content.addView(emptyText(ctx, "এই মুহূর্তে জরুরি কিছু নেই "));
             return;
         }
         for (Object[] row : list) {
@@ -1879,7 +1909,7 @@ public class BartalapToolsActivity extends BaseFragment {
             int sc = (Integer) row[0];
             final long did = m.getDialogId();
             String badge = sc >= 9 ? "🔴 খুব জরুরি" : sc >= 6 ? "🟠 জরুরি" : "🟡 দেখুন";
-            content.addView(itemCard(ctx, badge + "  ·  " + dialogName(did), shorten(m.messageText, 100) + "\n" + timeAgo(m.messageOwner.date),
+            content.addView(itemCard(ctx, badge + " · " + dialogName(did), shorten(m.messageText, 100) + "\n" + timeAgo(m.messageOwner.date),
                     v -> openChat(did, 0), null));
         }
     }
@@ -1920,7 +1950,7 @@ public class BartalapToolsActivity extends BaseFragment {
             return;
         }
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle("কোন চ্যানেল?");
+        b.setTitle(cleanTitle("কোন চ্যানেল?"));
         b.setItems(names.toArray(new CharSequence[0]), (dlg, which) -> cb.onPicked(ids.get(which), names.get(which).toString()));
         showDialog(b.create());
     }
@@ -1956,9 +1986,9 @@ public class BartalapToolsActivity extends BaseFragment {
             int rank = 1;
             for (TLRPC.Message m : posts) {
                 final TLRPC.Message post = m;
-                String tag = m.views >= avg * 1.5 ? "🔥 " : m.views < avg * 0.6 ? "🧊 " : "";
+                String tag = m.views >= avg * 1.5 ? "সেরা · " : m.views < avg * 0.6 ? "কম · " : "";
                 String body = (m.message == null || m.message.isEmpty()) ? "(মিডিয়া পোস্ট)" : shorten(m.message, 110);
-                statsBox.addView(itemCard(ctx, "#" + rank + "  " + tag + "👁 " + m.views + (m.forwards > 0 ? "  ↗️ " + m.forwards : ""),
+                statsBox.addView(itemCard(ctx, "#" + rank + " " + tag + m.views + " ভিউ" + (m.forwards > 0 ? " · " + m.forwards + " শেয়ার" : ""),
                         body + "\n" + clock(m.date * 1000L), v -> {
                             abPick.add(post);
                             if (abPick.size() == 1) {
@@ -1981,12 +2011,12 @@ public class BartalapToolsActivity extends BaseFragment {
         ca.setTimeInMillis(a.date * 1000L);
         java.util.Calendar cb = java.util.Calendar.getInstance();
         cb.setTimeInMillis(b.date * 1000L);
-        String msg = "A: 👁 " + a.views + " · " + hourLabel(ca.get(java.util.Calendar.HOUR_OF_DAY)) + "\n" + shorten(a.message, 80)
-                + "\n\nB: 👁 " + b.views + " · " + hourLabel(cb.get(java.util.Calendar.HOUR_OF_DAY)) + "\n" + shorten(b.message, 80)
-                + "\n\n🏆 জয়ী: " + (win == a ? "A" : "B") + " (" + String.format(Locale.US, "%.0f", diff) + "% বেশি ভিউ)\nচ্যানেলের গড়: " + avg
+        String msg = "A: " + a.views + " · " + hourLabel(ca.get(java.util.Calendar.HOUR_OF_DAY)) + "\n" + shorten(a.message, 80)
+                + "\n\nB: " + b.views + " · " + hourLabel(cb.get(java.util.Calendar.HOUR_OF_DAY)) + "\n" + shorten(b.message, 80)
+                + "\n\n জয়ী: " + (win == a ? "A" : "B") + " (" + String.format(Locale.US, "%.0f", diff) + "% বেশি ভিউ)\nচ্যানেলের গড়: " + avg
                 + "\n\nটিপস: জয়ী পোস্টের ধরন, লেখার স্টাইল আর সময় পরের পোস্টে ব্যবহার করুন।";
         AlertDialog.Builder bd = new AlertDialog.Builder(getParentActivity());
-        bd.setTitle("📊 A/B তুলনা");
+        bd.setTitle(cleanTitle("📊 A/B তুলনা"));
         bd.setMessage(msg);
         bd.setPositiveButton("ঠিক আছে", null);
         showDialog(bd.create());
@@ -2046,7 +2076,7 @@ public class BartalapToolsActivity extends BaseFragment {
                 if (m == null || m.message == null || m.message.trim().isEmpty()) continue;
                 h.append("<article>").append(linkify(esc(m.message))).append("<time>")
                         .append(new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.US).format(new Date(m.date * 1000L)))
-                        .append(m.views > 0 ? " · 👁 " + m.views : "").append("</time></article>");
+                        .append(m.views > 0 ? " · " + m.views : "").append("</time></article>");
                 count++;
             }
             h.append("</main><footer>Made with Bartalap</footer></body></html>");
@@ -2130,7 +2160,7 @@ public class BartalapToolsActivity extends BaseFragment {
                     String fn = org.telegram.messenger.FileLoader.getDocumentFileName(m.media.document);
                     if (fn != null && !fn.isEmpty()) desc = "📎 " + fn + (desc.isEmpty() ? "" : "\n" + desc);
                 }
-                results.addView(itemCard(ctx, dialogName(did) + "  ·  " + timeAgo(m.date), desc.isEmpty() ? null : desc,
+                results.addView(itemCard(ctx, dialogName(did) + " · " + timeAgo(m.date), desc.isEmpty() ? null : desc,
                         v -> openChat(did, mid), null));
             }
         }));
@@ -2143,8 +2173,8 @@ public class BartalapToolsActivity extends BaseFragment {
     private void backupDialog(Context ctx) {
         if (getParentActivity() == null) return;
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
-        b.setTitle("💾 ব্যাকআপ / রিস্টোর");
-        b.setItems(new CharSequence[]{"📤 Saved Messages-এ ব্যাকআপ পাঠান", "📋 ব্যাকআপ কপি করুন", "📥 কপি করা ব্যাকআপ থেকে রিস্টোর"}, (d, which) -> {
+        b.setTitle(cleanTitle("💾 ব্যাকআপ / রিস্টোর"));
+        b.setItems(cleanItems(new CharSequence[]{"📤 Saved Messages-এ ব্যাকআপ পাঠান", "📋 ব্যাকআপ কপি করুন", "📥 কপি করা ব্যাকআপ থেকে রিস্টোর"}), (d, which) -> {
             JSONObject all = new JSONObject();
             try {
                 for (String k : BACKUP_KEYS) all.put(k, loadArray(k));
@@ -2158,7 +2188,7 @@ public class BartalapToolsActivity extends BaseFragment {
                     org.telegram.messenger.SendMessagesHelper.getInstance(currentAccount)
                             .sendMessage(org.telegram.messenger.SendMessagesHelper.SendMessageParams.of(part, self));
                 }
-                toast("Saved Messages-এ ব্যাকআপ পাঠানো হয়েছে ✅");
+                toast("Saved Messages-এ ব্যাকআপ পাঠানো হয়েছে ");
             } else if (which == 1) {
                 copy(data);
             } else {
@@ -2171,7 +2201,7 @@ public class BartalapToolsActivity extends BaseFragment {
                         JSONArray arr = o.optJSONArray(k);
                         if (arr != null) saveArray(k, arr);
                     }
-                    toast("রিস্টোর হয়েছে ✅");
+                    toast("রিস্টোর হয়েছে ");
                     build(ctx);
                 } catch (Exception e) {
                     toast("ক্লিপবোর্ডে সঠিক ব্যাকআপ নেই। আগে ব্যাকআপ লেখাটা পুরো কপি করুন।");
@@ -2206,8 +2236,8 @@ public class BartalapToolsActivity extends BaseFragment {
         p0.setLayoutParams(lp(16));
         content.addView(p0);
         content.addView(text(ctx, "চ্যাট লিস্টে উপরে নিজের স্টোরির ঘরে (+) চাপুন, বা চ্যাট লিস্ট নিচে টেনে ক্যামেরা খুলুন → নিচে \"Live\" বেছে নিন → কারা দেখবে ঠিক করুন → Start Live Stream।\n"
-                + "• উপরে দেখাবে কতজন দেখছে 👁\n• সবাই কমেন্ট করতে পারবে, আপনি সব দেখবেন (⚙️ থেকে Allow Comments)\n"
-                + "• দর্শকরা Stars ⭐ পাঠাতে পারবে, চাইলে প্রতি কমেন্টে Stars দাম রাখতে পারবেন\n"
+                + "• উপরে দেখাবে কতজন দেখছে \n• সবাই কমেন্ট করতে পারবে, আপনি সব দেখবেন ( থেকে Allow Comments)\n"
+                + "• দর্শকরা Stars পাঠাতে পারবে, চাইলে প্রতি কমেন্টে Stars দাম রাখতে পারবেন\n"
                 + "• আপনার কন্টাক্টরা নোটিফিকেশন পাবে যে আপনি লাইভে আছেন\n• Keep this live in your profile চালু করলে লাইভ প্রোফাইলে থেকে যাবে", 13.5f, false, grayColor()));
 
         TextView v0 = text(ctx, "🎙 শুধু ভয়েস লাইভ (ক্যামেরা ছাড়া)", 15, true, textColor());
@@ -2267,7 +2297,7 @@ public class BartalapToolsActivity extends BaseFragment {
                 return;
             }
             org.telegram.messenger.BartalapAiAutoReply.setEnabled(!org.telegram.messenger.BartalapAiAutoReply.isEnabled());
-            toast(org.telegram.messenger.BartalapAiAutoReply.isEnabled() ? "AI অটো-রিপ্লাই চালু ✅" : "বন্ধ হয়েছে");
+            toast(org.telegram.messenger.BartalapAiAutoReply.isEnabled() ? "AI অটো-রিপ্লাই চালু " : "বন্ধ হয়েছে");
             build(ctx);
         });
         toggle.setLayoutParams(lp(10));
@@ -2330,7 +2360,7 @@ public class BartalapToolsActivity extends BaseFragment {
         content.addView(profile);
         Button saveProfile = button(ctx, "💾 সেভ করুন", v -> {
             p.edit().putString(org.telegram.messenger.BartalapAiAutoReply.KEY_PROFILE, profile.getText().toString().trim()).apply();
-            toast("সেভ হয়েছে ✅");
+            toast("সেভ হয়েছে ");
         });
         saveProfile.setLayoutParams(lp(8));
         content.addView(saveProfile);
@@ -2366,7 +2396,7 @@ public class BartalapToolsActivity extends BaseFragment {
                     if (success) {
                         style.setText(result);
                         p.edit().putString(org.telegram.messenger.BartalapAiAutoReply.KEY_STYLE, result).apply();
-                        toast("স্টাইল শেখা হয়েছে ✅ চাইলে এডিট করে সেভ করুন");
+                        toast("স্টাইল শেখা হয়েছে চাইলে এডিট করে সেভ করুন");
                     } else {
                         toast("শেখা যায়নি: " + result);
                     }
@@ -2377,7 +2407,7 @@ public class BartalapToolsActivity extends BaseFragment {
         content.addView(learn);
         Button saveStyle = button(ctx, "💾 স্টাইল সেভ করুন", v -> {
             p.edit().putString(org.telegram.messenger.BartalapAiAutoReply.KEY_STYLE, style.getText().toString().trim()).apply();
-            toast("সেভ হয়েছে ✅");
+            toast("সেভ হয়েছে ");
         });
         saveStyle.setLayoutParams(lp(8));
         content.addView(saveStyle);
@@ -2431,14 +2461,14 @@ public class BartalapToolsActivity extends BaseFragment {
             JSONObject o = log.optJSONObject(i);
             if (o == null) continue;
             if (o.has("err")) {
-                content.addView(itemCard(ctx, "⚠️ " + o.optString("chat") + "  ·  " + clock(o.optLong("time")),
+                content.addView(itemCard(ctx, "⚠️ " + o.optString("chat") + " · " + clock(o.optLong("time")),
                         (o.optString("in").isEmpty() ? "" : "সে: " + shorten(o.optString("in"), 80) + "\n") + "উত্তর দেয়নি: " + o.optString("err"), null, null));
                 continue;
             }
-            content.addView(itemCard(ctx, (o.optBoolean("voice") ? "🎙 " : "💬 ") + o.optString("chat") + "  ·  " + clock(o.optLong("time")),
+            content.addView(itemCard(ctx, (o.optBoolean("voice") ? "🎙 " : "💬 ") + o.optString("chat") + " · " + clock(o.optLong("time")),
                     "সে: " + shorten(o.optString("in"), 80) + "\nAI: " + o.optString("out"), null, null));
         }
-        TextView tip = text(ctx, "কোনো নির্দিষ্ট চ্যাটে AI চান না? সেই চ্যাটে ⋮ → ⚡ Bartalap Tools → \"এই চ্যাটে AI অটো-রিপ্লাই বন্ধ\"।\n"
+        TextView tip = text(ctx, "কোনো নির্দিষ্ট চ্যাটে AI চান না? সেই চ্যাটে ⋮ → Bartalap Tools → \"এই চ্যাটে AI অটো-রিপ্লাই বন্ধ\"।\n"
                 + "নিরাপত্তা: AI টাকা/পেমেন্ট নিয়ে কোনো কথা দেবে না, পেমেন্ট পেয়েছি বলবে না, আর কেউ সত্যিই জিজ্ঞেস করলে বলবে এটা অটো-রিপ্লাই, আপনি পরে উত্তর দেবেন।", 12.5f, false, grayColor());
         tip.setLayoutParams(lp(16));
         content.addView(tip);

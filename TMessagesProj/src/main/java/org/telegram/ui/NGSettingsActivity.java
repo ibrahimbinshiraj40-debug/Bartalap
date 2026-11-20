@@ -969,7 +969,7 @@ public class NGSettingsActivity extends BaseFragment {
             } else if (type == 2) {
                 TextSettingsCell t = (TextSettingsCell) holder.itemView;
                 if (position == rowBartalapTools) {
-                    t.setText("✨ Bartalap Tools · নতুন ফিচার", true);
+                    t.setText("Bartalap Tools · নতুন ফিচার", true);
                 } else if (position == rowStorageDoctor) {
                     t.setText("🧹 Smart Storage Doctor", true);
                 } else if (position == rowResetDefaults) {

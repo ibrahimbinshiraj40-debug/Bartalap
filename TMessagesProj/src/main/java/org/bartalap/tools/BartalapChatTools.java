@@ -49,8 +49,13 @@ public final class BartalapChatTools {
         return AndroidUtilities.dp(v);
     }
 
+    private static CharSequence[] cleanArr(CharSequence[] a) {
+        for (int i = 0; i < a.length; i++) a[i] = BartalapIcons.clean(a[i].toString());
+        return a;
+    }
+
     private static void toast(String s) {
-        Toast.makeText(ApplicationLoader.applicationContext, s, Toast.LENGTH_SHORT).show();
+        Toast.makeText(ApplicationLoader.applicationContext, BartalapIcons.clean(s), Toast.LENGTH_SHORT).show();
     }
 
     private static String chatName(ChatActivity chat, long dialogId, boolean firstNameOnly) {
@@ -71,7 +76,7 @@ public final class BartalapChatTools {
             ChatActivityEnterView enter = chat.getChatActivityEnterView();
             if (enter != null) {
                 enter.setFieldText(text);
-                toast("মেসেজ বক্সে বসানো হয়েছে, দেখে Send চাপুন ✅");
+                toast("মেসেজ বক্সে বসানো হয়েছে, দেখে Send চাপুন ");
                 return;
             }
         } catch (Throwable ignored) {
@@ -83,7 +88,7 @@ public final class BartalapChatTools {
         try {
             ClipboardManager cm = (ClipboardManager) ApplicationLoader.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE);
             cm.setPrimaryClip(ClipData.newPlainText("bartalap", text));
-            toast("কপি হয়েছে ✅");
+            toast("কপি হয়েছে ");
         } catch (Throwable ignored) {
         }
     }
@@ -107,8 +112,9 @@ public final class BartalapChatTools {
                 "😴 চ্যাট স্নুজ (পরে মনে করাবে)",
                 "⚙️ AI সেটিংস"
         };
+        for (int i = 0; i < items.length; i++) items[i] = BartalapIcons.clean(items[i].toString());
         AlertDialog.Builder b = new AlertDialog.Builder(a);
-        b.setTitle("⚡ Bartalap Tools");
+        b.setTitle(BartalapIcons.clean("⚡ Bartalap Tools"));
         b.setItems(items, (d, which) -> {
             switch (which) {
                 case 0: quickReply(chat, dialogId); break;
@@ -123,7 +129,7 @@ public final class BartalapChatTools {
                 case 9: {
                     boolean ex = org.telegram.messenger.BartalapAiAutoReply.isExcluded(dialogId);
                     org.telegram.messenger.BartalapAiAutoReply.setExcluded(dialogId, !ex);
-                    toast(ex ? "এই চ্যাটে AI অটো-রিপ্লাই চালু ✅" : "এই চ্যাটে AI আর উত্তর দেবে না");
+                    toast(ex ? "এই চ্যাটে AI অটো-রিপ্লাই চালু " : "এই চ্যাটে AI আর উত্তর দেবে না");
                     break;
                 }
                 case 10: contactNote(chat, dialogId); break;
@@ -148,7 +154,7 @@ public final class BartalapChatTools {
         }
         if (arr.length() == 0) {
             arr.put("আসসালামু আলাইকুম {নাম} ভাই, কিভাবে সাহায্য করতে পারি?");
-            arr.put("ধন্যবাদ {নাম} ভাই, আপনার অর্ডার কনফার্ম হয়েছে ✅");
+            arr.put("ধন্যবাদ {নাম} ভাই, আপনার অর্ডার কনফার্ম হয়েছে ");
         }
         String name = chatName(chat, dialogId, true);
         CharSequence[] list = new CharSequence[arr.length()];
@@ -156,7 +162,7 @@ public final class BartalapChatTools {
             list[i] = BartalapToolsActivity.fillTemplate(arr.optString(i), name);
         }
         AlertDialog.Builder b = new AlertDialog.Builder(a);
-        b.setTitle("⚡ Quick Reply (" + (name.isEmpty() ? "এই চ্যাট" : name) + ")");
+        b.setTitle(BartalapIcons.clean("⚡ Quick Reply (" + (name.isEmpty() ? "এই চ্যাট" : name) + ")"));
         b.setItems(list, (d, which) -> putInInput(chat, list[which].toString()));
         b.setNegativeButton("বন্ধ", null);
         b.setNeutralButton("টেমপ্লেট এডিট", (d, w) -> chat.presentFragment(new BartalapToolsActivity(BartalapToolsActivity.MODE_QUICK_REPLY)));
@@ -199,7 +205,7 @@ public final class BartalapChatTools {
         box.addView(speedBtn);
         box.addView(info);
         AlertDialog.Builder b = new AlertDialog.Builder(a);
-        b.setTitle("🎙️ লিখে ভয়েস পাঠান");
+        b.setTitle(BartalapIcons.clean("🎙️ লিখে ভয়েস পাঠান"));
         b.setView(box);
         b.setNegativeButton("বাতিল", null);
         b.setPositiveButton("ভয়েস পাঠান", (d, w) -> {
@@ -212,10 +218,10 @@ public final class BartalapChatTools {
             prefs().edit().putFloat("voice_speed", speed[0]).apply();
             toast("ভয়েস তৈরি হচ্ছে… ⏳");
             VoiceNoteMaker.makeAndSend(chat.getCurrentAccount(), dialogId, t, speed[0], 1.0f, (ok, error) -> {
-                if (ok) toast("ভয়েস মেসেজ পাঠানো হয়েছে ✅");
+                if (ok) toast("ভয়েস মেসেজ পাঠানো হয়েছে ");
                 else if (chat.getParentActivity() != null) {
                     AlertDialog.Builder eb = new AlertDialog.Builder(chat.getParentActivity());
-                    eb.setTitle("⚠️ ভয়েস পাঠানো যায়নি");
+                    eb.setTitle(BartalapIcons.clean("⚠️ ভয়েস পাঠানো যায়নি"));
                     eb.setMessage(error);
                     eb.setPositiveButton("ঠিক আছে", null);
                     eb.show();
@@ -246,7 +252,7 @@ public final class BartalapChatTools {
         box.addView(in);
         box.addView(preview);
         AlertDialog.Builder b = new AlertDialog.Builder(a);
-        b.setTitle("⌨️ বাংলিশ → বাংলা");
+        b.setTitle(BartalapIcons.clean("⌨️ বাংলিশ → বাংলা"));
         b.setView(box);
         b.setNegativeButton("বাতিল", null);
         b.setPositiveButton("মেসেজ বক্সে দিন", (d, w) -> putInInput(chat, BanglishConverter.convert(in.getText().toString())));
@@ -313,7 +319,7 @@ public final class BartalapChatTools {
                 ScrollView sv = new ScrollView(chat.getParentActivity());
                 sv.addView(tv);
                 AlertDialog.Builder b = new AlertDialog.Builder(chat.getParentActivity());
-                b.setTitle(success ? title : "⚠️ সমস্যা");
+                b.setTitle(BartalapIcons.clean(success ? title : "⚠️ সমস্যা"));
                 b.setView(sv);
                 if (success && offerInsert) {
                     b.setPositiveButton("মেসেজ বক্সে দিন", (d, w) -> putInInput(chat, result));
@@ -388,7 +394,7 @@ public final class BartalapChatTools {
             return;
         }
         AlertDialog.Builder b = new AlertDialog.Builder(chat.getParentActivity());
-        b.setTitle("কোন ছবিটা পড়বে?");
+        b.setTitle(BartalapIcons.clean("কোন ছবিটা পড়বে?"));
         b.setItems(labels.toArray(new CharSequence[0]), (d, which) -> readPayment(chat, dialogId, paths.get(which)));
         chat.showDialog(b.create());
     }
@@ -413,7 +419,7 @@ public final class BartalapChatTools {
             AndroidUtilities.runOnUIThread(() -> {
                 if (chat.getParentActivity() == null) return;
                 AlertDialog.Builder b = new AlertDialog.Builder(chat.getParentActivity());
-                b.setTitle(success ? "💳 পেমেন্টের তথ্য" : "⚠️ সমস্যা");
+                b.setTitle(BartalapIcons.clean(success ? "💳 পেমেন্টের তথ্য" : "⚠️ সমস্যা"));
                 b.setMessage(text);
                 b.setNegativeButton("বন্ধ", null);
                 if (success) {
@@ -451,7 +457,7 @@ public final class BartalapChatTools {
         }
         if (dueCount == 0) sb.append("কিছু বাকি নেই\n");
         else sb.append("মোট বাকি: ৳").append(due).append("\n");
-        sb.append("\n🧾 চ্যাটে পাওয়া পেমেন্ট:\n");
+        sb.append("\n চ্যাটে পাওয়া পেমেন্ট:\n");
         int pay = 0;
         int links = 0;
         int photos = 0;
@@ -477,12 +483,12 @@ public final class BartalapChatTools {
             }
         }
         if (pay == 0) sb.append("লোড করা মেসেজে কোনো TrxID নেই\n");
-        sb.append("\n📊 লোড করা ").append(total).append(" মেসেজে: ").append(photos).append(" ছবি, ").append(links).append(" লিংক");
+        sb.append("\n লোড করা ").append(total).append(" মেসেজে: ").append(photos).append(" ছবি, ").append(links).append(" লিংক");
         if (first != Integer.MAX_VALUE) {
-            sb.append("\n📅 শুরু (লোড করা অংশে): ").append(new SimpleDateFormat("dd MMM yyyy", Locale.US).format(new Date(first * 1000L)));
+            sb.append("\n শুরু (লোড করা অংশে): ").append(new SimpleDateFormat("dd MMM yyyy", Locale.US).format(new Date(first * 1000L)));
         }
         AlertDialog.Builder b = new AlertDialog.Builder(a);
-        b.setTitle("📜 " + name);
+        b.setTitle(BartalapIcons.clean("📜 " + name));
         b.setMessage(sb.toString());
         b.setPositiveButton("ঠিক আছে", null);
         b.setNeutralButton("নোট এডিট", (d, w) -> contactNote(chat, dialogId));
@@ -546,7 +552,7 @@ public final class BartalapChatTools {
         box.addView(model);
         box.addView(help);
         AlertDialog.Builder b = new AlertDialog.Builder(a);
-        b.setTitle("⚙️ AI সেটিংস");
+        b.setTitle(BartalapIcons.clean("⚙️ AI সেটিংস"));
         b.setView(box);
         b.setNegativeButton("বাতিল", null);
         b.setPositiveButton("সেভ", (d, w) -> {
@@ -555,7 +561,7 @@ public final class BartalapChatTools {
                     .putString(AiClient.KEY_API_KEY, key.getText().toString().trim())
                     .putString(AiClient.KEY_MODEL, model.getText().toString().trim())
                     .apply();
-            toast("AI সেটিংস সেভ হয়েছে ✅");
+            toast("AI সেটিংস সেভ হয়েছে ");
             if (after != null && AiClient.isConfigured()) after.run();
         });
         b.show();
@@ -566,9 +572,9 @@ public final class BartalapChatTools {
     private static void snooze(ChatActivity chat, long dialogId) {
         Activity a = chat.getParentActivity();
         String name = chatName(chat, dialogId, false);
-        CharSequence[] opts = {"১ ঘণ্টা পর", "৩ ঘণ্টা পর", "আজ রাত ৯টায়", "কাল সকাল ৯টায়"};
+        CharSequence[] opts = cleanArr(new CharSequence[]{"১ ঘণ্টা পর", "৩ ঘণ্টা পর", "আজ রাত ৯টায়", "কাল সকাল ৯টায়"});
         AlertDialog.Builder b = new AlertDialog.Builder(a);
-        b.setTitle("😴 কখন মনে করাবে?");
+        b.setTitle(BartalapIcons.clean("😴 কখন মনে করাবে?"));
         b.setItems(opts, (d, which) -> {
             long minutes;
             java.util.Calendar now = java.util.Calendar.getInstance();
@@ -590,7 +596,7 @@ public final class BartalapChatTools {
                 minutes = Math.max(1, (t.getTimeInMillis() - now.getTimeInMillis()) / 60000L);
             }
             BartalapReminders.snooze(chat.getCurrentAccount(), dialogId, name, minutes);
-            toast("চ্যাটটা Archive-এ গেল। সময় হলে নোটিফিকেশন দিয়ে ফিরিয়ে আনবে ✅");
+            toast("চ্যাটটা Archive-এ গেল। সময় হলে নোটিফিকেশন দিয়ে ফিরিয়ে আনবে ");
             chat.finishFragment();
         });
         b.setNegativeButton("বাতিল", null);
@@ -616,7 +622,7 @@ public final class BartalapChatTools {
         box.setPadding(dp(20), dp(8), dp(20), dp(8));
         box.addView(e, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         AlertDialog.Builder b = new AlertDialog.Builder(a);
-        b.setTitle("📝 " + name);
+        b.setTitle(BartalapIcons.clean("📝 " + name));
         b.setView(box);
         b.setNegativeButton("বাতিল", null);
         b.setPositiveButton("সেভ", (d, w) -> {
@@ -642,7 +648,7 @@ public final class BartalapChatTools {
                 prefs().edit().putString("contact_notes", out.toString()).apply();
             } catch (Exception ignored) {
             }
-            toast("নোট সেভ হয়েছে ✅");
+            toast("নোট সেভ হয়েছে ");
         });
         chat.showDialog(b.create());
     }
@@ -662,7 +668,7 @@ public final class BartalapChatTools {
         box.addView(amount);
         box.addView(note);
         AlertDialog.Builder b = new AlertDialog.Builder(a);
-        b.setTitle("💰 " + name + " এর বাকি");
+        b.setTitle(BartalapIcons.clean("💰 " + name + " এর বাকি"));
         b.setView(box);
         b.setNegativeButton("বাতিল", null);
         b.setPositiveButton("যোগ করুন", (d, w) -> {
@@ -686,7 +692,7 @@ public final class BartalapChatTools {
                 o.put("dialog_id", dialogId);
                 arr.put(o);
                 prefs().edit().putString("due_ledger", arr.toString()).apply();
-                toast("বাকির খাতায় যোগ হয়েছে ✅");
+                toast("বাকির খাতায় যোগ হয়েছে ");
             } catch (Exception ignored) {
             }
         });
