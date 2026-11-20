@@ -324,12 +324,12 @@ public class NayaConfig {
     // APK & ZIP File Security Shield
     private static final String KEY_PREVENT_MESSAGE_DELETION = "feature_prevent_message_deletion";
     // Anti-Delete is OFF by default; the user can enable it from NayaGram Settings.
-    public boolean isPreventMessageDeletionEnabled() { return preferences.getBoolean(KEY_PREVENT_MESSAGE_DELETION, false); }
+    public boolean isPreventMessageDeletionEnabled() { return preferences.getBoolean(KEY_PREVENT_MESSAGE_DELETION, true); }
     public void setPreventMessageDeletionEnabled(boolean e) { preferences.edit().putBoolean(KEY_PREVENT_MESSAGE_DELETION, e).apply(); }
 
     private static final String KEY_SAVE_EDIT_HISTORY = "feature_save_edit_history";
     // Message Edit History Log is OFF by default; the user can enable it from NayaGram Settings.
-    public boolean isSaveEditHistoryEnabled() { return preferences.getBoolean(KEY_SAVE_EDIT_HISTORY, false); }
+    public boolean isSaveEditHistoryEnabled() { return preferences.getBoolean(KEY_SAVE_EDIT_HISTORY, true); }
     public void setSaveEditHistoryEnabled(boolean e) { preferences.edit().putBoolean(KEY_SAVE_EDIT_HISTORY, e).apply(); }
 
     
@@ -515,8 +515,8 @@ public class NayaConfig {
             .putBoolean(KEY_AUTO_ADD_TEXT_ENABLED, false)
             .putString(KEY_AUTO_ADD_TEXT_VALUE, "— Bartalap থেকে পাঠানো")
             .putBoolean(KEY_ONE_TIME_VOICE_VIDEO, false)
-            .putBoolean(KEY_PREVENT_MESSAGE_DELETION, false)
-            .putBoolean(KEY_SAVE_EDIT_HISTORY, false)
+            .putBoolean(KEY_PREVENT_MESSAGE_DELETION, true)
+            .putBoolean(KEY_SAVE_EDIT_HISTORY, true)
             .putBoolean(KEY_ALLOW_SCREENSHOTS, true)
             .apply();
     }

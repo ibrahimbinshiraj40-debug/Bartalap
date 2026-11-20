@@ -2136,7 +2136,21 @@ public class BartalapToolsActivity extends BaseFragment {
         open.setLayoutParams(lp(12));
         content.addView(open);
 
-        TextView a = text(ctx, "১. ফোনের ক্যামেরা বা স্ক্রিন দিয়ে লাইভ", 15, true, textColor());
+        TextView p0 = text(ctx, "⭐ নিজের আইডি থেকে লাইভ (Facebook-এর মতো)", 15, true, textColor());
+        p0.setLayoutParams(lp(16));
+        content.addView(p0);
+        content.addView(text(ctx, "চ্যাট লিস্টে উপরে নিজের স্টোরির ঘরে (+) চাপুন, বা চ্যাট লিস্ট নিচে টেনে ক্যামেরা খুলুন → নিচে \"Live\" বেছে নিন → কারা দেখবে ঠিক করুন → Start Live Stream।\n"
+                + "• উপরে দেখাবে কতজন দেখছে 👁\n• সবাই কমেন্ট করতে পারবে, আপনি সব দেখবেন (⚙️ থেকে Allow Comments)\n"
+                + "• দর্শকরা Stars ⭐ পাঠাতে পারবে, চাইলে প্রতি কমেন্টে Stars দাম রাখতে পারবেন\n"
+                + "• আপনার কন্টাক্টরা নোটিফিকেশন পাবে যে আপনি লাইভে আছেন\n• Keep this live in your profile চালু করলে লাইভ প্রোফাইলে থেকে যাবে", 13.5f, false, grayColor()));
+
+        TextView v0 = text(ctx, "🎙 শুধু ভয়েস লাইভ (ক্যামেরা ছাড়া)", 15, true, textColor());
+        v0.setLayoutParams(lp(16));
+        content.addView(v0);
+        content.addView(text(ctx, "নিজের গ্রুপ বা চ্যানেল খুলুন → উপরে নাম → ⋮ → Start Voice Chat / Live Stream। ক্যামেরা চালু না করলে শুধু ভয়েসে চলবে। "
+                + "শ্রোতারা হাত তুলে কথা বলার অনুমতি চাইতে পারবে, উপরে কতজন শুনছে দেখাবে। চাইলে স্ক্রিন শেয়ারও করা যাবে।", 13.5f, false, grayColor()));
+
+        TextView a = text(ctx, "১. চ্যানেলে ক্যামেরা বা স্ক্রিন দিয়ে লাইভ", 15, true, textColor());
         a.setLayoutParams(lp(16));
         content.addView(a);
         content.addView(text(ctx, "চ্যানেল খুলুন → উপরে চ্যানেলের নাম → ⋮ → Start Live Stream → Start Streaming। তারপর ক্যামেরা আইকন দিয়ে ভিডিও বা Share Screen দিয়ে স্ক্রিন লাইভ।", 13.5f, false, grayColor()));

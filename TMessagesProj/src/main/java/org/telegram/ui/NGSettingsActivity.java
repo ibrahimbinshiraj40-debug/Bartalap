@@ -938,9 +938,9 @@ public class NGSettingsActivity extends BaseFragment {
                 } else if (position == rowSmartChatFolders) {
                     c.setActionFeature(R.drawable.outline_groups_24, 0xFF10B981, "Smart Chat Folders", "Create and manage Telegram chat folders", false);
                 } else if (position == rowAntiDelete) {
-                    c.setFeature(R.drawable.msg_delete, 0xFF0284C7, "Anti-Delete Messages", "Keep deleted messages in chat with cyan indicator", cfg.isPreventMessageDeletionEnabled(), true);
+                    c.setFeature(R.drawable.msg_delete, 0xFF0284C7, "ডিলিট করা মেসেজ দেখুন (Anti-Delete)", "কেউ মেসেজ, ভয়েস, ছবি পাঠিয়ে ডিলিট করলেও আপনার কাছে থেকে যাবে, পাশে চিহ্ন দেখাবে", cfg.isPreventMessageDeletionEnabled(), true);
                 } else if (position == rowEditHistory) {
-                    c.setFeature(R.drawable.msg_edit, 0xFF6366F1, "Message Edit History Log", "Capture & view original and previous edited versions of messages. Off by default.", cfg.isSaveEditHistoryEnabled(), true);
+                    c.setFeature(R.drawable.msg_edit, 0xFF6366F1, "এডিটের আগের লেখা দেখুন (Edit History)", "কেউ মেসেজ এডিট করলে আগে কী লিখেছিল সব দেখা যাবে। মেসেজে চাপ দিয়ে দেখুন", cfg.isSaveEditHistoryEnabled(), true);
                 } else if (position == rowShowIdDc) {
                     c.setFeature(R.drawable.ic_naya_info, 0xFF1565C0, "User ID & DC Display", "Show Telegram ID & DataCenter in profile", cfg.isShowIdAndDc(), true);
                 } else if (position == rowBiometricLocker) {
