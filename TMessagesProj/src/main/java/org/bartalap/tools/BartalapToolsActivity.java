@@ -322,6 +322,13 @@ public class BartalapToolsActivity extends BaseFragment {
         content.addView(itemCard(ctx, "⭐ জরুরি ইনবক্স", "পেমেন্ট, অর্ডার, জরুরি মেসেজ আগে দেখাবে",
                 v -> presentFragment(new BartalapToolsActivity(MODE_PRIORITY)), null));
         content.addView(ghostCard(ctx));
+        boolean nsOn = BartalapAudio.isNoiseFilterEnabled();
+        content.addView(itemCard(ctx, "🎙 ভয়েস মেসেজে নয়েজ কমানো: " + (nsOn ? "চালু ✅" : "বন্ধ"),
+                "রেকর্ড করা ভয়েসের পেছনের শব্দ কমাবে আর আওয়াজ ঠিক রাখবে। চাপ দিয়ে চালু/বন্ধ করুন",
+                v -> {
+                    BartalapAudio.setNoiseFilterEnabled(!BartalapAudio.isNoiseFilterEnabled());
+                    build(ctx);
+                }, null));
         boolean digestOn = BartalapReminders.isDigestEnabled();
         content.addView(itemCard(ctx, "🌙 ডেইলি ডাইজেস্ট: " + (digestOn ? "চালু ✅" : "বন্ধ"),
                 "প্রতিদিন রাত ৯টায় একটা নোটিফিকেশন: কতগুলো মেসেজ পড়া হয়নি, কার উত্তর বাকি। চাপ দিয়ে চালু/বন্ধ করুন",
