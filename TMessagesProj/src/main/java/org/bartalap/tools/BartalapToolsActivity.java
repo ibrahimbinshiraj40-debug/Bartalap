@@ -2292,6 +2292,14 @@ public class BartalapToolsActivity extends BaseFragment {
             p.edit().putBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_FAST, !org.telegram.messenger.BartalapAiAutoReply.isFast()).apply();
             build(ctx);
         }, null));
+        int pause = p.getInt(org.telegram.messenger.BartalapAiAutoReply.KEY_PAUSE_SEC, 60);
+        content.addView(itemCard(ctx, "✋ আমি নিজে লিখলে AI থামবে: " + (pause == 0 ? "কখনো না (সবসময় উত্তর দেবে)" : pause == 60 ? "১ মিনিট" : "১০ মিনিট"),
+                "আপনি কোনো চ্যাটে নিজে উত্তর দিলে AI সেখানে এতক্ষণ চুপ থাকবে, যাতে দুজন একসাথে উত্তর না দেন। চাপ দিয়ে বদলান", v -> {
+            int cur = p.getInt(org.telegram.messenger.BartalapAiAutoReply.KEY_PAUSE_SEC, 60);
+            int next = cur == 60 ? 0 : cur == 0 ? 600 : 60;
+            p.edit().putInt(org.telegram.messenger.BartalapAiAutoReply.KEY_PAUSE_SEC, next).apply();
+            build(ctx);
+        }, null));
         boolean onlyContacts = p.getBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_CONTACTS, false);
         content.addView(itemCard(ctx, "কাদের: " + (onlyContacts ? "শুধু কন্টাক্টে থাকা মানুষ" : "সবাই (Everyone)"), "গ্রুপ আর চ্যানেলে কখনো উত্তর দেবে না। চাপ দিয়ে বদলান", v -> {
             p.edit().putBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_CONTACTS, !p.getBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_CONTACTS, false)).apply();

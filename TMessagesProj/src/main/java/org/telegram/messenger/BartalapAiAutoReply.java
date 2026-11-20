@@ -37,6 +37,8 @@ public final class BartalapAiAutoReply {
     public static final String KEY_LOG = "ai_auto_log";
     public static final String KEY_MAX_PER_HOUR = "ai_auto_max_per_hour";
     public static final String KEY_FAST = "ai_auto_fast";
+    /** Seconds the AI stays quiet in a chat after the user typed there himself (0 = never pause). */
+    public static final String KEY_PAUSE_SEC = "ai_auto_pause_sec";
 
     public static boolean isFast() {
         return prefs().getBoolean(KEY_FAST, true);
@@ -247,12 +249,15 @@ public final class BartalapAiAutoReply {
             if (res == null || res.messages == null || res.messages.isEmpty()) return;
             TLRPC.Message newest = res.messages.get(0);
             if (newest.out) return; // already answered (by the user or AI)
-            // If the user himself wrote in this chat in the last 10 minutes, he is handling it.
+            // If the user himself wrote in this chat very recently, he is handling it.
+            int pauseSec = prefs().getInt(KEY_PAUSE_SEC, 60);
             Long lastAi = lastAiSendAt.get(dialogId);
             long nowSec = System.currentTimeMillis() / 1000L;
-            for (TLRPC.Message m : res.messages) {
-                if (m.out && nowSec - m.date < 600) {
-                    if (lastAi == null || m.date * 1000L > lastAi + 5000) return;
+            if (pauseSec > 0) {
+                for (TLRPC.Message m : res.messages) {
+                    if (m.out && nowSec - m.date < pauseSec) {
+                        if (lastAi == null || m.date * 1000L > lastAi + 5000) return;
+                    }
                 }
             }
             TLRPC.User other = MessagesController.getInstance(account).getUser(dialogId);
