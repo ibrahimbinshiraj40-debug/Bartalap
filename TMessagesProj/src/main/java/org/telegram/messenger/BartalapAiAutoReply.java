@@ -60,6 +60,31 @@ public final class BartalapAiAutoReply {
 
     public static void setEnabled(boolean on) {
         prefs().edit().putBoolean(KEY_ENABLED, on).apply();
+        // Keep Telegram connected in the background (foreground service) while AI is on
+        AndroidUtilities.runOnUIThread(() -> {
+            try {
+                AutoReplyManager.getInstance().ensureBackgroundKeepAlive();
+                if (on) AutoReplySyncWorker.schedule(ApplicationLoader.applicationContext);
+                ApplicationLoader.startPushService();
+            } catch (Throwable ignored) {
+            }
+        });
+    }
+
+    /** Writes a "didn't reply because…" line to the log so the user can see what happened. */
+    private static void logProblem(String chat, String incoming, String reason) {
+        try {
+            JSONArray a = new JSONArray(prefs().getString(KEY_LOG, "[]"));
+            JSONObject o = new JSONObject();
+            o.put("chat", chat);
+            o.put("in", incoming);
+            o.put("err", reason);
+            o.put("time", System.currentTimeMillis());
+            a.put(o);
+            while (a.length() > 200) a.remove(0);
+            prefs().edit().putString(KEY_LOG, a.toString()).apply();
+        } catch (Exception ignored) {
+        }
     }
 
     public static boolean isExcluded(long dialogId) {
@@ -129,7 +154,11 @@ public final class BartalapAiAutoReply {
             if (prefs().getBoolean(KEY_ONLY_OFFLINE, true) && appVisible) return true;
             TLRPC.User u = MessagesController.getInstance(account).getUser(dialogId);
             if (u != null && (u.bot || u.self)) return true;
-            if (prefs().getBoolean(KEY_ONLY_CONTACTS, false) && (u == null || !u.contact)) return true;
+            if (prefs().getBoolean(KEY_ONLY_CONTACTS, false) && (u == null || !u.contact)) {
+                logProblem(u == null ? String.valueOf(dialogId) : u.first_name, msg.messageOwner.message == null ? "" : msg.messageOwner.message,
+                        "সে আপনার কন্টাক্টে নেই। AI সেটিংসে 'কাদের' → সবাই (Everyone) করুন");
+                return true;
+            }
 
             // Debounce: wait for the person to finish typing (several messages in a row → one reply)
             long token = System.nanoTime();
@@ -227,7 +256,11 @@ public final class BartalapAiAutoReply {
 
     private static void process(int account, long dialogId) {
         try {
-            if (!isEnabled() || !rateOk(dialogId)) return;
+            if (!isEnabled()) return;
+            if (!rateOk(dialogId)) {
+                logProblem(String.valueOf(dialogId), "", "এক ঘণ্টার সীমা শেষ, তাই উত্তর দেয়নি");
+                return;
+            }
             // 1) Load recent history of this chat
             final TLRPC.messages_Messages[] holder = new TLRPC.messages_Messages[1];
             final CountDownLatch latch = new CountDownLatch(1);
@@ -246,7 +279,10 @@ public final class BartalapAiAutoReply {
             });
             latch.await(25, TimeUnit.SECONDS);
             TLRPC.messages_Messages res = holder[0];
-            if (res == null || res.messages == null || res.messages.isEmpty()) return;
+            if (res == null || res.messages == null || res.messages.isEmpty()) {
+                logProblem(String.valueOf(dialogId), "", "ইন্টারনেট/Telegram থেকে চ্যাট লোড হয়নি");
+                return;
+            }
             TLRPC.Message newest = res.messages.get(0);
             if (newest.out) return; // already answered (by the user or AI)
             // If the user himself wrote in this chat very recently, he is handling it.
@@ -256,7 +292,10 @@ public final class BartalapAiAutoReply {
             if (pauseSec > 0) {
                 for (TLRPC.Message m : res.messages) {
                     if (m.out && nowSec - m.date < pauseSec) {
-                        if (lastAi == null || m.date * 1000L > lastAi + 5000) return;
+                        if (lastAi == null || m.date * 1000L > lastAi + 5000) {
+                            logProblem(String.valueOf(dialogId), describe(res.messages.get(0)), "আপনি নিজে এই চ্যাটে লিখেছেন, তাই AI থেমে ছিল");
+                            return;
+                        }
                     }
                 }
             }
@@ -289,7 +328,7 @@ public final class BartalapAiAutoReply {
                     + "- Never say a payment was received or confirm a TrxID. Never share passwords, codes, OTPs, phone numbers, addresses or private details.\n"
                     + "- For serious, sad, medical, legal, angry or very personal topics: reply briefly and kindly and say he will talk properly a little later.\n"
                     + "- Do not volunteer that this is automated. But if the person sincerely asks whether they are talking to a bot/AI/auto-reply, do not lie: say he is busy right now, this is his auto reply, and he will reply himself soon.\n"
-                    + "- If no reply is needed (e.g. the last message is just 'ok', a sticker, thanks, or a goodbye), output exactly: SKIP\n"
+                    + "- ALWAYS reply to every message. For 'ok', thanks, stickers or goodbyes reply very briefly and warmly (e.g. 'আচ্ছা ভাই 😊', 'ঠিক আছে', 'আল্লাহ হাফেজ').\n"
                     + "- Output ONLY the reply text.\n\n"
                     + "ABOUT " + myName + " (his own notes):\n" + (profile.isEmpty() ? "(none)" : profile) + "\n\n"
                     + "HIS WRITING STYLE:\n" + (style.isEmpty() ? "(learn from the history below)" : style);
@@ -297,12 +336,20 @@ public final class BartalapAiAutoReply {
             int voicePercentEarly = prefs().getInt(KEY_VOICE_PERCENT, 20);
             boolean wantVoice = voicePercentEarly > 0 && RANDOM.nextInt(100) < voicePercentEarly;
             TypingShow typing = new TypingShow(account, dialogId, wantVoice);
-            String reply;
-            try {
-                reply = AiClient.ask(system, prompt);
-            } catch (Throwable e) {
+            String reply = null;
+            String aiError = null;
+            for (int attempt = 0; attempt < 2 && reply == null; attempt++) {
+                try {
+                    reply = AiClient.ask(system, prompt);
+                } catch (Throwable e) {
+                    aiError = e.getMessage();
+                    if (attempt == 0) Thread.sleep(1500);
+                }
+            }
+            if (reply == null) {
                 typing.stop();
-                throw e;
+                logProblem(otherName, lastIncoming, "AI উত্তর দিতে পারেনি: " + (aiError == null ? "অজানা সমস্যা" : aiError));
+                return;
             }
             if (reply == null) {
                 typing.stop();
@@ -310,7 +357,8 @@ public final class BartalapAiAutoReply {
             }
             reply = reply.trim();
             if (reply.startsWith("\"") && reply.endsWith("\"") && reply.length() > 1) reply = reply.substring(1, reply.length() - 1).trim();
-            if (reply.isEmpty() || reply.equalsIgnoreCase("SKIP") || reply.startsWith("SKIP") || !isEnabled()) {
+            if (reply.equalsIgnoreCase("SKIP") || reply.startsWith("SKIP")) reply = "আচ্ছা 😊";
+            if (reply.isEmpty() || !isEnabled()) {
                 typing.stop();
                 return;
             }

@@ -46,7 +46,7 @@ public class NotificationsService extends Service {
     private final Runnable heartbeatRunnable = new Runnable() {
         @Override
         public void run() {
-            if (!AutoReplyManager.getInstance().isAutoReplyEnabled()) {
+            if (!AutoReplyManager.getInstance().isKeepAliveNeeded()) {
                 stopForegroundIfActive();
                 return;
             }
@@ -59,7 +59,7 @@ public class NotificationsService extends Service {
     };
 
     private final Runnable networkRestoreSyncRunnable = () -> {
-        if (AutoReplyManager.getInstance().isAutoReplyEnabled()) {
+        if (AutoReplyManager.getInstance().isKeepAliveNeeded()) {
             syncActiveAccounts(true);
         }
     };
@@ -68,7 +68,7 @@ public class NotificationsService extends Service {
     public void onCreate() {
         super.onCreate();
         ApplicationLoader.postInitApplication();
-        if (AutoReplyManager.getInstance().isAutoReplyEnabled()) {
+        if (AutoReplyManager.getInstance().isKeepAliveNeeded()) {
             startForegroundCompat();
         }
         registerNetworkRestoreCallback();
@@ -77,7 +77,7 @@ public class NotificationsService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         ApplicationLoader.postInitApplication();
-        boolean autoReplyEnabled = AutoReplyManager.getInstance().isAutoReplyEnabled();
+        boolean autoReplyEnabled = AutoReplyManager.getInstance().isKeepAliveNeeded();
         boolean requestedForeground = intent != null && intent.getBooleanExtra(EXTRA_START_FOREGROUND, false);
 
         if (autoReplyEnabled) {
@@ -226,7 +226,7 @@ public class NotificationsService extends Service {
         stopForegroundIfActive();
         super.onDestroy();
         SharedPreferences preferences = MessagesController.getGlobalNotificationsSettings();
-        if (preferences.getBoolean("pushService", true) || AutoReplyManager.getInstance().isAutoReplyEnabled()) {
+        if (preferences.getBoolean("pushService", true) || AutoReplyManager.getInstance().isKeepAliveNeeded()) {
             Intent intent = new Intent("org.nayagram.platform.start");
             intent.setPackage(getPackageName());
             sendBroadcast(intent);

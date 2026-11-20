@@ -215,7 +215,7 @@ public class ApplicationLoader extends Application {
                     boolean isSlow = isConnectionSlow();
                     boolean autoReplyOn = false;
                     try {
-                        autoReplyOn = AutoReplyManager.getInstance().isAutoReplyEnabled();
+                        autoReplyOn = AutoReplyManager.getInstance().isKeepAliveNeeded();
                     } catch (Throwable ignored) {}
                     for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
                         ConnectionsManager.getInstance(a).checkConnection();
@@ -405,7 +405,7 @@ public class ApplicationLoader extends Application {
         }
         boolean autoReplyEnabled = false;
         try {
-            if (AutoReplyManager.getInstance().isAutoReplyEnabled()) {
+            if (AutoReplyManager.getInstance().isKeepAliveNeeded()) {
                 enabled = true;
                 autoReplyEnabled = true;
                 AutoReplyManager.getInstance().ensureBackgroundKeepAlive();

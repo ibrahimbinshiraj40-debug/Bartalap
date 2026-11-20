@@ -71,7 +71,7 @@ public class AutoReplyManager {
             synchronized (AutoReplyManager.this) {
                 heartbeatScheduled = false;
             }
-            if (!isAutoReplyEnabled()) {
+            if (!isKeepAliveNeeded()) {
                 releaseBackgroundLocks();
                 return;
             }
@@ -100,7 +100,7 @@ public class AutoReplyManager {
         preferences = ApplicationLoader.applicationContext.getSharedPreferences(
                 PREFS_NAME, Context.MODE_PRIVATE);
         load();
-        if (isAutoReplyEnabled()) {
+        if (isKeepAliveNeeded()) {
             AndroidUtilities.runOnUIThread(() -> {
                 ensureBackgroundKeepAlive();
                 AutoReplySyncWorker.schedule(ApplicationLoader.applicationContext);
@@ -117,7 +117,7 @@ public class AutoReplyManager {
     }
 
     public synchronized void ensureBackgroundKeepAlive() {
-        if (!isAutoReplyEnabled()) {
+        if (!isKeepAliveNeeded()) {
             releaseBackgroundLocks();
             return;
         }
@@ -139,7 +139,7 @@ public class AutoReplyManager {
     }
 
     private synchronized void scheduleNextHeartbeat() {
-        if (heartbeatScheduled || !isAutoReplyEnabled()) {
+        if (heartbeatScheduled || !isKeepAliveNeeded()) {
             return;
         }
         heartbeatScheduled = true;
@@ -212,6 +212,15 @@ public class AutoReplyManager {
                 ApplicationLoader.startPushService();
             } catch (Throwable ignored) {}
         }
+    }
+
+    /** True when something needs the app awake in the background (classic auto answer or Bartalap AI). */
+    public boolean isKeepAliveNeeded() {
+        try {
+            if (BartalapAiAutoReply.isEnabled()) return true;
+        } catch (Throwable ignored) {
+        }
+        return isAutoReplyEnabled();
     }
 
     public synchronized boolean isAutoReplyEnabled() {

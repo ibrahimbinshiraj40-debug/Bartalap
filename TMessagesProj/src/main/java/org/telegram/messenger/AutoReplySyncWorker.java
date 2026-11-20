@@ -63,7 +63,7 @@ public class AutoReplySyncWorker extends Worker {
             AndroidUtilities.runOnUIThread(() -> {
                 try {
                     ApplicationLoader.postInitApplication();
-                    if (AutoReplyManager.getInstance().isAutoReplyEnabled()) {
+                    if (AutoReplyManager.getInstance().isKeepAliveNeeded()) {
                         AutoReplyManager.getInstance().ensureBackgroundKeepAlive();
                         ApplicationLoader.startPushService();
                         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
@@ -83,7 +83,7 @@ public class AutoReplySyncWorker extends Worker {
                 }
             });
             latch.await(15, TimeUnit.SECONDS);
-            if (AutoReplyManager.getInstance().isAutoReplyEnabled()) {
+            if (AutoReplyManager.getInstance().isKeepAliveNeeded()) {
                 IncomingMessageInterceptor.awaitBackgroundAutoReply(14000);
             }
         } catch (Throwable t) {

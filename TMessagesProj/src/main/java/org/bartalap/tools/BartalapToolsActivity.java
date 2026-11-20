@@ -2430,6 +2430,11 @@ public class BartalapToolsActivity extends BaseFragment {
         for (int i = log.length() - 1; i >= Math.max(0, log.length() - 40); i--) {
             JSONObject o = log.optJSONObject(i);
             if (o == null) continue;
+            if (o.has("err")) {
+                content.addView(itemCard(ctx, "⚠️ " + o.optString("chat") + "  ·  " + clock(o.optLong("time")),
+                        (o.optString("in").isEmpty() ? "" : "সে: " + shorten(o.optString("in"), 80) + "\n") + "উত্তর দেয়নি: " + o.optString("err"), null, null));
+                continue;
+            }
             content.addView(itemCard(ctx, (o.optBoolean("voice") ? "🎙 " : "💬 ") + o.optString("chat") + "  ·  " + clock(o.optLong("time")),
                     "সে: " + shorten(o.optString("in"), 80) + "\nAI: " + o.optString("out"), null, null));
         }
