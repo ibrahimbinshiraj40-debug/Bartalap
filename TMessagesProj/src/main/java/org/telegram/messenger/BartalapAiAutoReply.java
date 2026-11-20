@@ -36,6 +36,11 @@ public final class BartalapAiAutoReply {
     public static final String KEY_EXCLUDED = "ai_auto_excluded";
     public static final String KEY_LOG = "ai_auto_log";
     public static final String KEY_MAX_PER_HOUR = "ai_auto_max_per_hour";
+    public static final String KEY_FAST = "ai_auto_fast";
+
+    public static boolean isFast() {
+        return prefs().getBoolean(KEY_FAST, true);
+    }
 
     private static final Random RANDOM = new Random();
     private static final ConcurrentHashMap<Long, Long> pendingToken = new ConcurrentHashMap<>();
@@ -127,7 +132,8 @@ public final class BartalapAiAutoReply {
             // Debounce: wait for the person to finish typing (several messages in a row → one reply)
             long token = System.nanoTime();
             pendingToken.put(dialogId, token);
-            long delay = 12_000L + RANDOM.nextInt(18_000);
+            // Fast mode: answer almost instantly (2s wait only to group messages sent in a burst)
+            long delay = isFast() ? 2_000L : 12_000L + RANDOM.nextInt(18_000);
             holdWake(delay + 90_000L);
             ConnectionsManager.getInstance(account).keepNetworkAliveInBackground();
             Utilities.globalQueue.postRunnable(() -> {
@@ -196,7 +202,7 @@ public final class BartalapAiAutoReply {
                 try {
                     TLRPC.TL_messages_getHistory req = new TLRPC.TL_messages_getHistory();
                     req.peer = MessagesController.getInstance(account).getInputPeer(dialogId);
-                    req.limit = 40;
+                    req.limit = isFast() ? 25 : 40;
                     ConnectionsManager.getInstance(account).sendRequest(req, (response, error) -> {
                         if (response instanceof TLRPC.messages_Messages) holder[0] = (TLRPC.messages_Messages) response;
                         latch.countDown();
@@ -266,7 +272,7 @@ public final class BartalapAiAutoReply {
             final String finalOther = otherName;
 
             // Short human-like "typing time"
-            Thread.sleep(Math.min(9000, 1500 + finalReply.length() * 60L));
+            if (!isFast()) Thread.sleep(Math.min(9000, 1500 + finalReply.length() * 60L));
             if (asVoice) {
                 final CountDownLatch vl = new CountDownLatch(1);
                 final boolean[] ok = {false};

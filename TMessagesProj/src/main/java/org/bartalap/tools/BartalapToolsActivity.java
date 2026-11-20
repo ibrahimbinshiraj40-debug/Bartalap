@@ -2287,8 +2287,13 @@ public class BartalapToolsActivity extends BaseFragment {
             p.edit().putBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_OFFLINE, !p.getBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_OFFLINE, true)).apply();
             build(ctx);
         }, null));
+        boolean fast = org.telegram.messenger.BartalapAiAutoReply.isFast();
+        content.addView(itemCard(ctx, "⚡ গতি: " + (fast ? "তাৎক্ষণিক (সাথে সাথে উত্তর)" : "মানুষের মতো (১৫-৪০ সেকেন্ড পরে)"), "চাপ দিয়ে বদলান", v -> {
+            p.edit().putBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_FAST, !org.telegram.messenger.BartalapAiAutoReply.isFast()).apply();
+            build(ctx);
+        }, null));
         boolean onlyContacts = p.getBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_CONTACTS, false);
-        content.addView(itemCard(ctx, "কাদের: " + (onlyContacts ? "শুধু কন্টাক্টে থাকা মানুষ" : "সবাই (প্রাইভেট চ্যাট)"), "গ্রুপ আর চ্যানেলে কখনো উত্তর দেবে না। চাপ দিয়ে বদলান", v -> {
+        content.addView(itemCard(ctx, "কাদের: " + (onlyContacts ? "শুধু কন্টাক্টে থাকা মানুষ" : "সবাই (Everyone)"), "গ্রুপ আর চ্যানেলে কখনো উত্তর দেবে না। চাপ দিয়ে বদলান", v -> {
             p.edit().putBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_CONTACTS, !p.getBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_CONTACTS, false)).apply();
             build(ctx);
         }, null));
