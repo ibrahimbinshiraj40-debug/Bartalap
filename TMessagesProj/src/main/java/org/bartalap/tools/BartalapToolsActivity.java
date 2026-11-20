@@ -78,6 +78,7 @@ public class BartalapToolsActivity extends BaseFragment {
     public static final int MODE_POSTS = 16;
     public static final int MODE_WEBSITE = 17;
     public static final int MODE_MEDIA = 18;
+    public static final int MODE_LIVE = 19;
 
     private static final String PREFS = "bartalap_tools";
     private static final String KEY_TEMPLATES = "quick_replies";
@@ -282,6 +283,7 @@ public class BartalapToolsActivity extends BaseFragment {
             case MODE_POSTS: return "পোস্ট পারফরম্যান্স ও A/B";
             case MODE_WEBSITE: return "চ্যানেল থেকে ওয়েবসাইট";
             case MODE_MEDIA: return "মিডিয়া খুঁজুন";
+            case MODE_LIVE: return "লাইভ স্টুডিও";
             default: return "Bartalap Tools";
         }
     }
@@ -307,6 +309,7 @@ public class BartalapToolsActivity extends BaseFragment {
             case MODE_POSTS: buildPosts(ctx); break;
             case MODE_WEBSITE: buildWebsite(ctx); break;
             case MODE_MEDIA: buildMedia(ctx); break;
+            case MODE_LIVE: buildLive(ctx); break;
             default: buildHome(ctx); break;
         }
     }
@@ -359,6 +362,8 @@ public class BartalapToolsActivity extends BaseFragment {
                 v -> presentFragment(new BartalapToolsActivity(MODE_CROSSPOST)), null));
         content.addView(itemCard(ctx, "📈 চ্যানেল ট্র্যাকার", "নিজের বা প্রতিযোগীর পাবলিক চ্যানেলের সাবস্ক্রাইবার কত বাড়ছে দেখুন",
                 v -> presentFragment(new BartalapToolsActivity(MODE_TRACKER)), null));
+        content.addView(itemCard(ctx, "🔴 লাইভ স্টুডিও", "চ্যানেলে লাইভ, স্ক্রিন লাইভ, আর একসাথে Telegram + YouTube + Facebook লাইভের সহজ গাইড",
+                v -> presentFragment(new BartalapToolsActivity(MODE_LIVE)), null));
         content.addView(itemCard(ctx, "🔥 পোস্ট পারফরম্যান্স ও A/B তুলনা", "কোন পোস্টে বেশি ভিউ, দুটো পোস্ট পাশাপাশি তুলনা",
                 v -> presentFragment(new BartalapToolsActivity(MODE_POSTS)), null));
         content.addView(itemCard(ctx, "🌐 চ্যানেল থেকে ওয়েবসাইট", "চ্যানেলের পোস্ট দিয়ে এক চাপে ওয়েবসাইট (Netlify-তে আপলোড করুন)",
@@ -2111,4 +2116,50 @@ public class BartalapToolsActivity extends BaseFragment {
     }
 
     // backup card is added at the end of home
+
+    // ---------------------------------------------------------------- live studio guide
+
+    private void buildLive(Context ctx) {
+        LinearLayout hero = new LinearLayout(ctx);
+        hero.setOrientation(LinearLayout.VERTICAL);
+        hero.setPadding(dp(16), dp(16), dp(16), dp(16));
+        hero.setBackground(card(0xFFDC2626));
+        hero.addView(text(ctx, "🔴 লাইভ স্টুডিও", 20, true, 0xFFFFFFFF));
+        hero.addView(text(ctx, "ফোন থেকে লাইভ, স্ক্রিন শেয়ার লাইভ, আর একসাথে Telegram + YouTube + Facebook-এ লাইভ।", 13.5f, false, 0xEEFFFFFF));
+        hero.setLayoutParams(lp(8));
+        content.addView(hero);
+
+        Button open = button(ctx, "📢 যে চ্যানেলে লাইভ করবেন সেটা খুলুন", v -> pickChannel(ctx, (id, name) -> {
+            toast("উপরে চ্যানেলের নাম → ⋮ → Start Live Stream চাপুন");
+            openChat(id, 0);
+        }));
+        open.setLayoutParams(lp(12));
+        content.addView(open);
+
+        TextView a = text(ctx, "১. ফোনের ক্যামেরা বা স্ক্রিন দিয়ে লাইভ", 15, true, textColor());
+        a.setLayoutParams(lp(16));
+        content.addView(a);
+        content.addView(text(ctx, "চ্যানেল খুলুন → উপরে চ্যানেলের নাম → ⋮ → Start Live Stream → Start Streaming। তারপর ক্যামেরা আইকন দিয়ে ভিডিও বা Share Screen দিয়ে স্ক্রিন লাইভ।", 13.5f, false, grayColor()));
+
+        TextView b = text(ctx, "২. একসাথে Telegram + YouTube + Facebook (মাল্টি-স্ট্রিম)", 15, true, textColor());
+        b.setLayoutParams(lp(16));
+        content.addView(b);
+        content.addView(text(ctx, "চ্যানেল → Start Live Stream-এর পাশে \"Stream With…\" চাপলে Server URL আর Stream Key পাবেন।\n"
+                + "• Larix Broadcaster বা Prism Live (ফোন) / OBS (পিসি) অ্যাপে ৩টা জায়গার URL+Key বসান: Telegram, YouTube Studio → Go Live → Stream key, Facebook → Live Producer।\n"
+                + "• অথবা restream.io-তে একবার Key বসালে সবগুলোতে একসাথে যাবে।", 13.5f, false, grayColor()));
+
+        Button copyGuide = button(ctx, "📋 ধাপগুলো কপি করুন", v -> copy("Telegram + YouTube + Facebook একসাথে লাইভ:\n"
+                + "1) Telegram চ্যানেল → ⋮ → Start Live Stream → Stream With → Server URL + Stream Key কপি\n"
+                + "2) YouTube Studio → Create → Go Live → Stream key কপি\n"
+                + "3) Facebook → Live video → Streaming software → Stream key কপি\n"
+                + "4) Larix Broadcaster / Prism Live / OBS-এ ৩টা আলাদা Output-এ URL+Key বসিয়ে Start"));
+        copyGuide.setLayoutParams(lp(12));
+        content.addView(copyGuide);
+
+        TextView c = text(ctx, "৩. লাইভের পরে", 15, true, textColor());
+        c.setLayoutParams(lp(16));
+        content.addView(c);
+        content.addView(text(ctx, "Telegram লাইভ শেষ হলে রেকর্ডিং চ্যানেলে সেভ করা যায় (লাইভ শুরুর সময় Start Recording)। সেই ভিডিও থেকে Shorts কেটে নিতে পারবেন।", 13.5f, false, grayColor()));
+    }
+
 }
