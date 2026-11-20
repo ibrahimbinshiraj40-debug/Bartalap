@@ -14460,6 +14460,10 @@ public class MessagesController extends BaseController implements NotificationCe
         long dialogId = messageObject.getDialogId();
         getMessagesStorage().markMessagesContentAsRead(dialogId, arrayList, 0, 0);
         getNotificationCenter().postNotificationName(NotificationCenter.messagesReadContent, dialogId, arrayList);
+        // Bartalap Ghost Read: don't tell the sender we played their voice/video message.
+        if (NayoGramFeatures.isGhostModeEnabled() && DialogObject.isUserDialog(dialogId) && messageObject.getId() > 0) {
+            return;
+        }
         if (messageObject.getId() < 0) {
             markMessageAsRead(messageObject.getDialogId(), messageObject.messageOwner.random_id, Integer.MIN_VALUE);
         } else {

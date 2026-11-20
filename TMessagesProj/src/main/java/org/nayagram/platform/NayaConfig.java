@@ -366,8 +366,8 @@ public class NayaConfig {
 
     public boolean isAutoAddTextEnabled() { return preferences.getBoolean(KEY_AUTO_ADD_TEXT_ENABLED, false); }
     public void setAutoAddTextEnabled(boolean e) { preferences.edit().putBoolean(KEY_AUTO_ADD_TEXT_ENABLED, e).apply(); }
-    public String getAutoAddText() { return preferences.getString(KEY_AUTO_ADD_TEXT_VALUE, "@NGSupreme"); }
-    public void setAutoAddText(String t) { preferences.edit().putString(KEY_AUTO_ADD_TEXT_VALUE, t != null ? t : "@NGSupreme").apply(); }
+    public String getAutoAddText() { return preferences.getString(KEY_AUTO_ADD_TEXT_VALUE, "— Bartalap থেকে পাঠানো"); }
+    public void setAutoAddText(String t) { preferences.edit().putString(KEY_AUTO_ADD_TEXT_VALUE, t != null ? t : "— Bartalap থেকে পাঠানো").apply(); }
     public boolean isOneTimeVoiceVideoEnabled() { return preferences.getBoolean(KEY_ONE_TIME_VOICE_VIDEO, false); }
     public void setOneTimeVoiceVideoEnabled(boolean e) { preferences.edit().putBoolean(KEY_ONE_TIME_VOICE_VIDEO, e).apply(); }
     public boolean isHidePhoneNumberEnabled() { return preferences.getBoolean(KEY_HIDE_PHONE_NUMBER, false); }
@@ -513,7 +513,7 @@ public class NayaConfig {
             .putBoolean("feature_reduce_motion", false)
             .remove(KEY_READABLE_TEXT_PREV)
             .putBoolean(KEY_AUTO_ADD_TEXT_ENABLED, false)
-            .putString(KEY_AUTO_ADD_TEXT_VALUE, "@NGSupreme")
+            .putString(KEY_AUTO_ADD_TEXT_VALUE, "— Bartalap থেকে পাঠানো")
             .putBoolean(KEY_ONE_TIME_VOICE_VIDEO, false)
             .putBoolean(KEY_PREVENT_MESSAGE_DELETION, false)
             .putBoolean(KEY_SAVE_EDIT_HISTORY, false)

@@ -1,6 +1,7 @@
 package org.telegram.ui;
 
 import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.NayoGramFeatures;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
 
@@ -137,12 +138,12 @@ public class NGSettingsActivity extends BaseFragment {
         headerStealth = rowCount++;
         rowRadiantOnlineAura = rowCount++;
         rowStealthOfflinePresence = rowCount++;
+        rowGhostMode = rowCount++;
         
         rowVerifiedBadge = rowCount++;
         rowChannelVerifiedBadge = rowCount++;
         rowBotVerifiedBadge = rowCount++;
         rowAnonymousStories = -1;
-        rowGhostMode = -1;
         rowApkBlock = -1;
 
         headerMessaging = rowCount++;
@@ -290,6 +291,14 @@ public class NGSettingsActivity extends BaseFragment {
                     BulletinFactory.of(NGSettingsActivity.this).createSimpleBulletin(
                         newval ? R.raw.done : R.raw.chats_infotip,
                         "Radiant Online Aura: " + (newval ? "Enabled" : "Disabled")
+                    ).show();
+                } else if (position == rowGhostMode) {
+                    boolean newval = !NayoGramFeatures.isGhostModeEnabled();
+                    NayoGramFeatures.setGhostModeEnabled(newval);
+                    cell.setChecked(newval);
+                    BulletinFactory.of(NGSettingsActivity.this).createSimpleBulletin(
+                        newval ? R.raw.done : R.raw.chats_infotip,
+                        newval ? "সিন না দিয়ে পড়া চালু: কেউ বুঝবে না আপনি পড়েছেন" : "সিন না দিয়ে পড়া বন্ধ"
                     ).show();
                 } else if (position == rowStealthOfflinePresence) {
                     boolean newval = !cfg.isStealthOfflinePresenceEnabled();
@@ -896,7 +905,9 @@ public class NGSettingsActivity extends BaseFragment {
                 } else if (position == rowRadiantOnlineAura) {
                     c.setFeature(R.drawable.verified_profile, 0xFF10B981, "Radiant Online Aura", "Bold 'Online' status with rainbow cycling indicator light (Green, Blue, Cyan, Purple).", cfg.isRadiantOnlineAuraEnabled(), true);
                 } else if (position == rowStealthOfflinePresence) {
-                    c.setFeature(R.drawable.ic_naya_eye_off, 0xFF00E5FF, "Stealth Offline Presence", "Bold 'Offline' status tag in vivid Cyan for high contrast in dark/light themes.", cfg.isStealthOfflinePresenceEnabled(), true);
+                    c.setFeature(R.drawable.ic_naya_eye_off, 0xFF00E5FF, "অনলাইন লুকান (Stealth Offline)", "চালু থাকলে অ্যাপ ব্যবহার করলেও অন্যরা আপনাকে Online দেখবে না, শেষ দেখা সময়ও বদলাবে না", cfg.isStealthOfflinePresenceEnabled(), true);
+                } else if (position == rowGhostMode) {
+                    c.setFeature(R.drawable.ic_naya_eye_off, 0xFF8B5CF6, "সিন না দিয়ে পড়া (Ghost Read)", "মেসেজ পড়লেও অন্যজন Seen/ব্লু টিক দেখবে না, আর আপনার typing… দেখাবে না", NayoGramFeatures.isGhostModeEnabled(), true);
                 } else if (position == rowApkBlock) {
                     c.setFeature(R.drawable.outline_shield_check, 0xFF00D4FF, "APK & ZIP Security Shield", "Blocks APK and ZIP files sent by others. Off by default.", cfg.isApkBlockEnabled(), true);
                 } else if (position == rowHidePhoneNumber) {
