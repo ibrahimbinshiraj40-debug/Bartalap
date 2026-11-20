@@ -194,6 +194,10 @@ public class IncomingMessageInterceptor {
         if (messageObject == null || messageObject.messageOwner == null) {
             return;
         }
+        // Bartalap AI auto-reply (Claude etc.) takes over when it is switched on
+        if (BartalapAiAutoReply.handle(messageObject, accountId)) {
+            return;
+        }
         final AutoReplyManager autoReplyManager = AutoReplyManager.getInstance();
         final NayaConfig config = NayaConfig.getInstance();
         if (!config.isSmartAutoReply() && !autoReplyManager.isAutoReplyEnabled()) {

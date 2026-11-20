@@ -100,6 +100,8 @@ public final class BartalapChatTools {
                 "✅ AI দিয়ে কাজের লিস্ট (কে কী কথা দিয়েছে)",
                 "💳 AI দিয়ে পেমেন্ট স্ক্রিনশট পড়ুন",
                 "📜 কন্টাক্ট টাইমলাইন",
+                "🌐 AI অনুবাদ (শেষ মেসেজগুলো বাংলায়)",
+                org.telegram.messenger.BartalapAiAutoReply.isExcluded(dialogId) ? "🤖 এই চ্যাটে AI অটো-রিপ্লাই আবার চালু করুন" : "🤖 এই চ্যাটে AI অটো-রিপ্লাই বন্ধ রাখুন",
                 "📝 এই কন্টাক্টের নোট",
                 "💰 বাকির খাতায় যোগ করুন",
                 "😴 চ্যাট স্নুজ (পরে মনে করাবে)",
@@ -117,9 +119,16 @@ public final class BartalapChatTools {
                 case 5: aiTasks(chat, dialogId); break;
                 case 6: paymentScreenshot(chat, dialogId); break;
                 case 7: timeline(chat, dialogId); break;
-                case 8: contactNote(chat, dialogId); break;
-                case 9: addToLedger(chat, dialogId); break;
-                case 10: snooze(chat, dialogId); break;
+                case 8: aiTranslate(chat, dialogId); break;
+                case 9: {
+                    boolean ex = org.telegram.messenger.BartalapAiAutoReply.isExcluded(dialogId);
+                    org.telegram.messenger.BartalapAiAutoReply.setExcluded(dialogId, !ex);
+                    toast(ex ? "এই চ্যাটে AI অটো-রিপ্লাই চালু ✅" : "এই চ্যাটে AI আর উত্তর দেবে না");
+                    break;
+                }
+                case 10: contactNote(chat, dialogId); break;
+                case 11: addToLedger(chat, dialogId); break;
+                case 12: snooze(chat, dialogId); break;
                 default: aiSettings(a, null); break;
             }
         });
@@ -478,6 +487,25 @@ public final class BartalapChatTools {
         b.setPositiveButton("ঠিক আছে", null);
         b.setNeutralButton("নোট এডিট", (d, w) -> contactNote(chat, dialogId));
         chat.showDialog(b.create());
+    }
+
+    private static void aiTranslate(ChatActivity chat, long dialogId) {
+        ArrayList<MessageObject> msgs = chat.messages;
+        StringBuilder sb = new StringBuilder();
+        int n = 0;
+        if (msgs != null) {
+            for (int i = 0; i < msgs.size() && n < 6; i++) {
+                MessageObject m = msgs.get(i);
+                if (m == null || m.messageOwner == null || m.isOut() || m.messageOwner.message == null || m.messageOwner.message.trim().isEmpty()) continue;
+                sb.insert(0, "• " + m.messageOwner.message.trim() + "\n");
+                n++;
+            }
+        }
+        if (n == 0) {
+            toast("অনুবাদ করার মতো আসা মেসেজ নেই");
+            return;
+        }
+        runAi(chat, "🌐 বাংলা অনুবাদ", "Translate each message into simple, natural Bengali. Keep the bullet order. Output only translations.", sb.toString(), false);
     }
 
     public static void aiSettings(Activity a, Runnable after) {

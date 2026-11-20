@@ -79,6 +79,7 @@ public class BartalapToolsActivity extends BaseFragment {
     public static final int MODE_WEBSITE = 17;
     public static final int MODE_MEDIA = 18;
     public static final int MODE_LIVE = 19;
+    public static final int MODE_AI_AUTO = 20;
 
     private static final String PREFS = "bartalap_tools";
     private static final String KEY_TEMPLATES = "quick_replies";
@@ -284,6 +285,7 @@ public class BartalapToolsActivity extends BaseFragment {
             case MODE_WEBSITE: return "চ্যানেল থেকে ওয়েবসাইট";
             case MODE_MEDIA: return "মিডিয়া খুঁজুন";
             case MODE_LIVE: return "লাইভ স্টুডিও";
+            case MODE_AI_AUTO: return "AI অটো-রিপ্লাই";
             default: return "Bartalap Tools";
         }
     }
@@ -310,6 +312,7 @@ public class BartalapToolsActivity extends BaseFragment {
             case MODE_WEBSITE: buildWebsite(ctx); break;
             case MODE_MEDIA: buildMedia(ctx); break;
             case MODE_LIVE: buildLive(ctx); break;
+            case MODE_AI_AUTO: buildAiAuto(ctx); break;
             default: buildHome(ctx); break;
         }
     }
@@ -320,6 +323,10 @@ public class BartalapToolsActivity extends BaseFragment {
         TextView intro = text(ctx, "Bartalap-এর নিজস্ব ফিচার। যেকোনোটায় চাপ দিন 👇\nটিপস: যেকোনো চ্যাটে ⋮ → ⚡ Bartalap Tools থেকে Quick Reply, AI উত্তর, নোট সরাসরি পাবেন।", 14, false, grayColor());
         intro.setPadding(dp(4), dp(8), dp(4), dp(4));
         content.addView(intro);
+        boolean aiOn = org.telegram.messenger.BartalapAiAutoReply.isEnabled();
+        content.addView(itemCard(ctx, "🤖 AI অটো-রিপ্লাই: " + (aiOn ? "চালু ✅" : "বন্ধ"),
+                "আপনি অফলাইনে থাকলে Claude আপনার মতো করে সবার মেসেজের উত্তর দেবে, কখনো লিখে কখনো ভয়েসে। চালু/বন্ধ আর সেটিংস এখানে",
+                v -> presentFragment(new BartalapToolsActivity(MODE_AI_AUTO)), null));
         content.addView(itemCard(ctx, "📲 ইউনিফাইড ইনবক্স (WhatsApp, Messenger…)", "WhatsApp, Messenger, Instagram, IMO-র মেসেজ এখানে। কেউ ডিলিট করলেও দেখবেন, এখান থেকেই রিপ্লাই",
                 v -> presentFragment(new BartalapToolsActivity(MODE_UNIFIED)), null));
         content.addView(itemCard(ctx, "⭐ জরুরি ইনবক্স", "পেমেন্ট, অর্ডার, জরুরি মেসেজ আগে দেখাবে",
@@ -1392,6 +1399,34 @@ public class BartalapToolsActivity extends BaseFragment {
         msg.setText(prefs().getString("crosspost_draft", ""));
         msg.setLayoutParams(lp(10));
         content.addView(msg);
+        Button aiWrite = button(ctx, "🤖 AI দিয়ে পোস্ট লিখুন", v -> {
+            if (!AiClient.isConfigured()) {
+                BartalapChatTools.aiSettings(getParentActivity(), null);
+                return;
+            }
+            String topic = msg.getText().toString().trim();
+            if (topic.isEmpty()) {
+                toast("উপরের ঘরে বিষয়টা লিখুন, যেমন: ChatGPT Plus অফার ৫০০ টাকা");
+                return;
+            }
+            toast("AI লিখছে… ⏳");
+            new Thread(() -> {
+                String r;
+                try {
+                    r = AiClient.ask("You write catchy Telegram channel posts in natural Bengali for a Bangladeshi audience. Use a few relevant emoji, short lines, a clear call to action. Output only the post.",
+                            "এই বিষয়ে একটা পোস্ট লিখুন:\n" + topic);
+                } catch (Throwable e) {
+                    r = null;
+                }
+                final String out = r;
+                AndroidUtilities.runOnUIThread(() -> {
+                    if (out == null) toast("AI লিখতে পারেনি, API Key দেখুন");
+                    else msg.setText(out);
+                });
+            }).start();
+        });
+        aiWrite.setLayoutParams(lp(8));
+        content.addView(aiWrite);
 
         MessagesController mc = MessagesController.getInstance(currentAccount);
         ArrayList<Long> ids = new ArrayList<>();
@@ -1723,6 +1758,37 @@ public class BartalapToolsActivity extends BaseFragment {
         EditText in = input(ctx, canReply ? "উত্তর লিখুন (বাংলিশও চলবে)…" : "রিপ্লাই করতে নতুন মেসেজ আসার অপেক্ষা করুন", true);
         in.setLayoutParams(lp(16));
         content.addView(in);
+        Button aiBtn = button(ctx, "🤖 AI দিয়ে উত্তর লিখুন", v -> {
+            if (!AiClient.isConfigured()) {
+                BartalapChatTools.aiSettings(getParentActivity(), null);
+                return;
+            }
+            StringBuilder hist = new StringBuilder();
+            for (int i = Math.max(0, all.length() - 200); i < all.length(); i++) {
+                JSONObject o = all.optJSONObject(i);
+                if (o == null || !uPkg.equals(o.optString("pkg")) || !uChat.equals(o.optString("chat"))) continue;
+                hist.append(o.optBoolean("out") ? "আমি" : o.optString("sender")).append(": ").append(o.optString("text")).append('\n');
+            }
+            String profileNotes = org.telegram.messenger.BartalapAiAutoReply.prefs().getString(org.telegram.messenger.BartalapAiAutoReply.KEY_PROFILE, "");
+            String styleNotes = org.telegram.messenger.BartalapAiAutoReply.prefs().getString(org.telegram.messenger.BartalapAiAutoReply.KEY_STYLE, "");
+            toast("AI লিখছে… ⏳");
+            new Thread(() -> {
+                String r;
+                try {
+                    r = AiClient.ask("Write the account owner's next short, natural, friendly reply exactly in his style. Never promise money or prices not in his notes. Output only the reply.\nHIS NOTES:\n"
+                            + profileNotes + "\nHIS STYLE:\n" + styleNotes, "Chat:\n" + hist + "\nWrite 'আমি' next reply.");
+                } catch (Throwable e) {
+                    r = null;
+                }
+                final String out = r;
+                AndroidUtilities.runOnUIThread(() -> {
+                    if (out == null) toast("AI লিখতে পারেনি");
+                    else in.setText(out);
+                });
+            }).start();
+        });
+        aiBtn.setLayoutParams(lp(8));
+        content.addView(aiBtn);
         Button send = button(ctx, canReply ? "📤 " + BartalapNotificationListener.appName(uPkg) + "-এ উত্তর পাঠান" : "📱 " + BartalapNotificationListener.appName(uPkg) + " খুলুন", v -> {
             if (BartalapNotificationListener.canReply(uPkg, uChat)) {
                 String t = in.getText().toString().trim();
@@ -2174,6 +2240,190 @@ public class BartalapToolsActivity extends BaseFragment {
         c.setLayoutParams(lp(16));
         content.addView(c);
         content.addView(text(ctx, "Telegram লাইভ শেষ হলে রেকর্ডিং চ্যানেলে সেভ করা যায় (লাইভ শুরুর সময় Start Recording)। সেই ভিডিও থেকে Shorts কেটে নিতে পারবেন।", 13.5f, false, grayColor()));
+    }
+
+
+    // ---------------------------------------------------------------- AI auto-reply control panel
+
+    private void buildAiAuto(Context ctx) {
+        SharedPreferences p = org.telegram.messenger.BartalapAiAutoReply.prefs();
+        boolean on = org.telegram.messenger.BartalapAiAutoReply.isEnabled();
+        boolean keyOk = AiClient.isConfigured();
+
+        LinearLayout status = new LinearLayout(ctx);
+        status.setOrientation(LinearLayout.VERTICAL);
+        status.setPadding(dp(18), dp(18), dp(18), dp(18));
+        status.setBackground(card(on ? 0xFF16A34A : 0xFF475569));
+        status.addView(text(ctx, on ? "🤖 AI অটো-রিপ্লাই চালু" : "⏸ AI অটো-রিপ্লাই বন্ধ", 20, true, 0xFFFFFFFF));
+        status.addView(text(ctx, on
+                ? (p.getBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_OFFLINE, true) ? "আপনি অ্যাপের বাইরে থাকলে প্রাইভেট মেসেজের উত্তর AI দেবে" : "সব প্রাইভেট মেসেজের উত্তর AI দেবে")
+                : "চালু করলে আপনার হয়ে আপনার মতো করে উত্তর দেবে", 13.5f, false, 0xEEFFFFFF));
+        status.setLayoutParams(lp(8));
+        content.addView(status);
+
+        Button toggle = button(ctx, on ? "⏸ বন্ধ করুন" : "▶️ চালু করুন", v -> {
+            if (!AiClient.isConfigured()) {
+                BartalapChatTools.aiSettings(getParentActivity(), () -> build(ctx));
+                return;
+            }
+            org.telegram.messenger.BartalapAiAutoReply.setEnabled(!org.telegram.messenger.BartalapAiAutoReply.isEnabled());
+            toast(org.telegram.messenger.BartalapAiAutoReply.isEnabled() ? "AI অটো-রিপ্লাই চালু ✅" : "বন্ধ হয়েছে");
+            build(ctx);
+        });
+        toggle.setLayoutParams(lp(10));
+        content.addView(toggle);
+        if (!keyOk) {
+            TextView w = text(ctx, "⚠️ আগে AI সেটিংসে Claude API Key দিন।", 14, true, 0xFFDC2626);
+            w.setLayoutParams(lp(8));
+            content.addView(w);
+        }
+
+        // Options
+        TextView oh = text(ctx, "⚙️ নিয়ম", 16, true, textColor());
+        oh.setLayoutParams(lp(18));
+        content.addView(oh);
+        boolean onlyOffline = p.getBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_OFFLINE, true);
+        content.addView(itemCard(ctx, "কখন: " + (onlyOffline ? "শুধু আমি অ্যাপের বাইরে থাকলে" : "সবসময়"), "চাপ দিয়ে বদলান", v -> {
+            p.edit().putBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_OFFLINE, !p.getBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_OFFLINE, true)).apply();
+            build(ctx);
+        }, null));
+        boolean onlyContacts = p.getBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_CONTACTS, false);
+        content.addView(itemCard(ctx, "কাদের: " + (onlyContacts ? "শুধু কন্টাক্টে থাকা মানুষ" : "সবাই (প্রাইভেট চ্যাট)"), "গ্রুপ আর চ্যানেলে কখনো উত্তর দেবে না। চাপ দিয়ে বদলান", v -> {
+            p.edit().putBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_CONTACTS, !p.getBoolean(org.telegram.messenger.BartalapAiAutoReply.KEY_ONLY_CONTACTS, false)).apply();
+            build(ctx);
+        }, null));
+        int vp = p.getInt(org.telegram.messenger.BartalapAiAutoReply.KEY_VOICE_PERCENT, 20);
+        content.addView(itemCard(ctx, "🎙 ভয়েসে উত্তর: " + (vp == 0 ? "কখনো না" : vp + "% সময়"), "ছোট উত্তরগুলো মাঝে মাঝে ভয়েস মেসেজ হিসেবে যাবে (ফোনের বাংলা কণ্ঠে)। চাপ দিয়ে বদলান", v -> {
+            int cur = p.getInt(org.telegram.messenger.BartalapAiAutoReply.KEY_VOICE_PERCENT, 20);
+            int next = cur == 0 ? 20 : cur == 20 ? 40 : cur == 40 ? 70 : 0;
+            p.edit().putInt(org.telegram.messenger.BartalapAiAutoReply.KEY_VOICE_PERCENT, next).apply();
+            build(ctx);
+        }, null));
+        int mx = p.getInt(org.telegram.messenger.BartalapAiAutoReply.KEY_MAX_PER_HOUR, 8);
+        content.addView(itemCard(ctx, "সীমা: একজনকে ঘণ্টায় সর্বোচ্চ " + mx + " টা উত্তর", "API খরচ বাঁচাতে। চাপ দিয়ে বদলান", v -> {
+            int cur = p.getInt(org.telegram.messenger.BartalapAiAutoReply.KEY_MAX_PER_HOUR, 8);
+            int next = cur == 4 ? 8 : cur == 8 ? 15 : cur == 15 ? 30 : 4;
+            p.edit().putInt(org.telegram.messenger.BartalapAiAutoReply.KEY_MAX_PER_HOUR, next).apply();
+            build(ctx);
+        }, null));
+
+        // Profile
+        TextView ph = text(ctx, "👤 আমার সম্পর্কে (AI এটা পড়ে উত্তর দেবে)", 16, true, textColor());
+        ph.setLayoutParams(lp(18));
+        content.addView(ph);
+        EditText profile = input(ctx, "যেমন: আমি ইব্রাহিম, Free Help Now ইউটিউব চ্যানেল চালাই। ChatGPT Plus, Canva Pro বিক্রি করি। দাম: ... পেমেন্ট bKash-এ। সবাইকে 'ভাই' বলি। নামাজের সময় ব্যস্ত থাকি…", true);
+        profile.setMinLines(5);
+        profile.setText(p.getString(org.telegram.messenger.BartalapAiAutoReply.KEY_PROFILE, ""));
+        content.addView(profile);
+        Button saveProfile = button(ctx, "💾 সেভ করুন", v -> {
+            p.edit().putString(org.telegram.messenger.BartalapAiAutoReply.KEY_PROFILE, profile.getText().toString().trim()).apply();
+            toast("সেভ হয়েছে ✅");
+        });
+        saveProfile.setLayoutParams(lp(8));
+        content.addView(saveProfile);
+
+        // Style
+        TextView sh = text(ctx, "🧠 আমার লেখার স্টাইল", 16, true, textColor());
+        sh.setLayoutParams(lp(18));
+        content.addView(sh);
+        EditText style = input(ctx, "নিচের বাটন চাপলে আপনার আগের মেসেজ পড়ে AI নিজেই এখানে লিখে দেবে", true);
+        style.setMinLines(4);
+        style.setText(p.getString(org.telegram.messenger.BartalapAiAutoReply.KEY_STYLE, ""));
+        content.addView(style);
+        Button learn = button(ctx, "🧠 আগের মেসেজ পড়ে আমার স্টাইল শিখুন", v -> {
+            if (!AiClient.isConfigured()) {
+                BartalapChatTools.aiSettings(getParentActivity(), null);
+                return;
+            }
+            toast("আপনার আগের মেসেজ পড়া হচ্ছে… ⏳ (এক মিনিট লাগতে পারে)");
+            final int acc = currentAccount;
+            new Thread(() -> {
+                String r;
+                boolean ok;
+                try {
+                    r = org.telegram.messenger.BartalapAiAutoReply.learnStyle(acc);
+                    ok = true;
+                } catch (Throwable e) {
+                    r = e.getMessage();
+                    ok = false;
+                }
+                final String result = r == null ? "" : r;
+                final boolean success = ok;
+                AndroidUtilities.runOnUIThread(() -> {
+                    if (success) {
+                        style.setText(result);
+                        p.edit().putString(org.telegram.messenger.BartalapAiAutoReply.KEY_STYLE, result).apply();
+                        toast("স্টাইল শেখা হয়েছে ✅ চাইলে এডিট করে সেভ করুন");
+                    } else {
+                        toast("শেখা যায়নি: " + result);
+                    }
+                });
+            }).start();
+        });
+        learn.setLayoutParams(lp(8));
+        content.addView(learn);
+        Button saveStyle = button(ctx, "💾 স্টাইল সেভ করুন", v -> {
+            p.edit().putString(org.telegram.messenger.BartalapAiAutoReply.KEY_STYLE, style.getText().toString().trim()).apply();
+            toast("সেভ হয়েছে ✅");
+        });
+        saveStyle.setLayoutParams(lp(8));
+        content.addView(saveStyle);
+
+        // Test
+        TextView th = text(ctx, "🧪 টেস্ট করুন (কিছু পাঠাবে না)", 16, true, textColor());
+        th.setLayoutParams(lp(18));
+        content.addView(th);
+        EditText testIn = input(ctx, "কেউ যেন লিখেছে: ভাই ChatGPT Plus এর দাম কত?", false);
+        content.addView(testIn);
+        TextView testOut = text(ctx, "", 15, false, textColor());
+        testOut.setPadding(dp(14), dp(10), dp(14), dp(10));
+        testOut.setBackground(card(cardColor()));
+        testOut.setTextIsSelectable(true);
+        Button test = button(ctx, "🤖 AI কী উত্তর দিত দেখুন", v -> {
+            String q = testIn.getText().toString().trim();
+            if (q.isEmpty()) return;
+            testOut.setText("ভাবছে… ⏳");
+            String prof = profile.getText().toString().trim();
+            String sty = style.getText().toString().trim();
+            new Thread(() -> {
+                String r;
+                try {
+                    r = AiClient.ask("You reply on Telegram on behalf of the account owner, exactly like him, short and natural. "
+                                    + "Never promise money/prices not in his notes. Output only the reply.\nHIS NOTES:\n" + prof + "\nHIS STYLE:\n" + sty,
+                            "Friend: " + q + "\nWrite his reply.");
+                } catch (Throwable e) {
+                    r = "⚠️ " + e.getMessage();
+                }
+                final String out = r;
+                AndroidUtilities.runOnUIThread(() -> testOut.setText(out));
+            }).start();
+        });
+        test.setLayoutParams(lp(8));
+        content.addView(test);
+        testOut.setLayoutParams(lp(8));
+        content.addView(testOut);
+
+        // Log
+        TextView lh = text(ctx, "📜 AI যা যা উত্তর দিয়েছে", 16, true, textColor());
+        lh.setLayoutParams(lp(18));
+        content.addView(lh);
+        JSONArray log;
+        try {
+            log = new JSONArray(p.getString(org.telegram.messenger.BartalapAiAutoReply.KEY_LOG, "[]"));
+        } catch (Exception e) {
+            log = new JSONArray();
+        }
+        if (log.length() == 0) content.addView(emptyText(ctx, "এখনো কোনো উত্তর দেয়নি।"));
+        for (int i = log.length() - 1; i >= Math.max(0, log.length() - 40); i--) {
+            JSONObject o = log.optJSONObject(i);
+            if (o == null) continue;
+            content.addView(itemCard(ctx, (o.optBoolean("voice") ? "🎙 " : "💬 ") + o.optString("chat") + "  ·  " + clock(o.optLong("time")),
+                    "সে: " + shorten(o.optString("in"), 80) + "\nAI: " + o.optString("out"), null, null));
+        }
+        TextView tip = text(ctx, "কোনো নির্দিষ্ট চ্যাটে AI চান না? সেই চ্যাটে ⋮ → ⚡ Bartalap Tools → \"এই চ্যাটে AI অটো-রিপ্লাই বন্ধ\"।\n"
+                + "নিরাপত্তা: AI টাকা/পেমেন্ট নিয়ে কোনো কথা দেবে না, পেমেন্ট পেয়েছি বলবে না, আর কেউ সত্যিই জিজ্ঞেস করলে বলবে এটা অটো-রিপ্লাই, আপনি পরে উত্তর দেবেন।", 12.5f, false, grayColor());
+        tip.setLayoutParams(lp(16));
+        content.addView(tip);
     }
 
 }
