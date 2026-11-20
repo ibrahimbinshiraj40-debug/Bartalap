@@ -148,6 +148,37 @@ public final class BartalapAiAutoReply {
         return true;
     }
 
+    /** Shows "typing…" or "recording voice…" to the other person until stopped. */
+    private static final class TypingShow {
+        volatile boolean running = true;
+
+        TypingShow(int account, long dialogId, boolean voice) {
+            Thread t = new Thread(() -> {
+                while (running) {
+                    AndroidUtilities.runOnUIThread(() -> {
+                        try {
+                            TLRPC.TL_messages_setTyping req = new TLRPC.TL_messages_setTyping();
+                            req.peer = MessagesController.getInstance(account).getInputPeer(dialogId);
+                            req.action = voice ? new TLRPC.TL_sendMessageRecordAudioAction() : new TLRPC.TL_sendMessageTypingAction();
+                            ConnectionsManager.getInstance(account).sendRequest(req, (r, e) -> { });
+                        } catch (Throwable ignored) {
+                        }
+                    });
+                    try {
+                        Thread.sleep(4500);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+            }, "BartalapTyping");
+            t.start();
+        }
+
+        void stop() {
+            running = false;
+        }
+    }
+
     private static boolean rateOk(long dialogId) {
         int max = prefs().getInt(KEY_MAX_PER_HOUR, 8);
         ArrayList<Long> list = sentTimes.get(dialogId);
@@ -258,15 +289,27 @@ public final class BartalapAiAutoReply {
                     + "ABOUT " + myName + " (his own notes):\n" + (profile.isEmpty() ? "(none)" : profile) + "\n\n"
                     + "HIS WRITING STYLE:\n" + (style.isEmpty() ? "(learn from the history below)" : style);
             String prompt = "Chat with " + otherName + " (oldest first):\n" + chat + "\nWrite " + myName + "'s next reply now.";
-            String reply = AiClient.ask(system, prompt);
-            if (reply == null) return;
+            int voicePercentEarly = prefs().getInt(KEY_VOICE_PERCENT, 20);
+            boolean wantVoice = voicePercentEarly > 0 && RANDOM.nextInt(100) < voicePercentEarly;
+            TypingShow typing = new TypingShow(account, dialogId, wantVoice);
+            String reply;
+            try {
+                reply = AiClient.ask(system, prompt);
+            } catch (Throwable e) {
+                typing.stop();
+                throw e;
+            }
+            if (reply == null) {
+                typing.stop();
+                return;
+            }
             reply = reply.trim();
             if (reply.startsWith("\"") && reply.endsWith("\"") && reply.length() > 1) reply = reply.substring(1, reply.length() - 1).trim();
-            if (reply.isEmpty() || reply.equalsIgnoreCase("SKIP") || reply.startsWith("SKIP")) return;
-            if (!isEnabled()) return;
-
-            int voicePercent = prefs().getInt(KEY_VOICE_PERCENT, 20);
-            boolean asVoice = voicePercent > 0 && reply.length() < 220 && RANDOM.nextInt(100) < voicePercent;
+            if (reply.isEmpty() || reply.equalsIgnoreCase("SKIP") || reply.startsWith("SKIP") || !isEnabled()) {
+                typing.stop();
+                return;
+            }
+            boolean asVoice = wantVoice && reply.length() < 220;
             final String finalReply = reply;
             final String finalIncoming = lastIncoming;
             final String finalOther = otherName;
@@ -281,12 +324,14 @@ public final class BartalapAiAutoReply {
                     vl.countDown();
                 });
                 vl.await(120, TimeUnit.SECONDS);
+                typing.stop();
                 if (ok[0]) {
                     markSent(dialogId);
                     log(finalOther, finalIncoming, finalReply, true);
                     return;
                 }
             }
+            typing.stop();
             final CountDownLatch sl = new CountDownLatch(1);
             AndroidUtilities.runOnUIThread(() -> {
                 try {
