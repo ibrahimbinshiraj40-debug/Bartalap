@@ -72,6 +72,12 @@ public class BartalapToolsActivity extends BaseFragment {
     public static final int MODE_BEST_TIME = 10;
     public static final int MODE_CROSSPOST = 11;
     public static final int MODE_TRACKER = 12;
+    public static final int MODE_UNIFIED = 13;
+    public static final int MODE_UNIFIED_CHAT = 14;
+    public static final int MODE_PRIORITY = 15;
+    public static final int MODE_POSTS = 16;
+    public static final int MODE_WEBSITE = 17;
+    public static final int MODE_MEDIA = 18;
 
     private static final String PREFS = "bartalap_tools";
     private static final String KEY_TEMPLATES = "quick_replies";
@@ -270,6 +276,12 @@ public class BartalapToolsActivity extends BaseFragment {
             case MODE_BEST_TIME: return "পোস্ট করার সেরা সময়";
             case MODE_CROSSPOST: return "এক পোস্ট সব জায়গায়";
             case MODE_TRACKER: return "চ্যানেল ট্র্যাকার";
+            case MODE_UNIFIED: return "ইউনিফাইড ইনবক্স";
+            case MODE_UNIFIED_CHAT: return "চ্যাট";
+            case MODE_PRIORITY: return "জরুরি ইনবক্স";
+            case MODE_POSTS: return "পোস্ট পারফরম্যান্স ও A/B";
+            case MODE_WEBSITE: return "চ্যানেল থেকে ওয়েবসাইট";
+            case MODE_MEDIA: return "মিডিয়া খুঁজুন";
             default: return "Bartalap Tools";
         }
     }
@@ -289,6 +301,12 @@ public class BartalapToolsActivity extends BaseFragment {
             case MODE_BEST_TIME: buildBestTime(ctx); break;
             case MODE_CROSSPOST: buildCrossPost(ctx); break;
             case MODE_TRACKER: buildTracker(ctx); break;
+            case MODE_UNIFIED: buildUnified(ctx); break;
+            case MODE_UNIFIED_CHAT: buildUnifiedChat(ctx); break;
+            case MODE_PRIORITY: buildPriority(ctx); break;
+            case MODE_POSTS: buildPosts(ctx); break;
+            case MODE_WEBSITE: buildWebsite(ctx); break;
+            case MODE_MEDIA: buildMedia(ctx); break;
             default: buildHome(ctx); break;
         }
     }
@@ -299,6 +317,11 @@ public class BartalapToolsActivity extends BaseFragment {
         TextView intro = text(ctx, "Bartalap-এর নিজস্ব ফিচার। যেকোনোটায় চাপ দিন 👇\nটিপস: যেকোনো চ্যাটে ⋮ → ⚡ Bartalap Tools থেকে Quick Reply, AI উত্তর, নোট সরাসরি পাবেন।", 14, false, grayColor());
         intro.setPadding(dp(4), dp(8), dp(4), dp(4));
         content.addView(intro);
+        content.addView(itemCard(ctx, "📲 ইউনিফাইড ইনবক্স (WhatsApp, Messenger…)", "WhatsApp, Messenger, Instagram, IMO-র মেসেজ এখানে। কেউ ডিলিট করলেও দেখবেন, এখান থেকেই রিপ্লাই",
+                v -> presentFragment(new BartalapToolsActivity(MODE_UNIFIED)), null));
+        content.addView(itemCard(ctx, "⭐ জরুরি ইনবক্স", "পেমেন্ট, অর্ডার, জরুরি মেসেজ আগে দেখাবে",
+                v -> presentFragment(new BartalapToolsActivity(MODE_PRIORITY)), null));
+        content.addView(ghostCard(ctx));
         boolean digestOn = BartalapReminders.isDigestEnabled();
         content.addView(itemCard(ctx, "🌙 ডেইলি ডাইজেস্ট: " + (digestOn ? "চালু ✅" : "বন্ধ"),
                 "প্রতিদিন রাত ৯টায় একটা নোটিফিকেশন: কতগুলো মেসেজ পড়া হয়নি, কার উত্তর বাকি। চাপ দিয়ে চালু/বন্ধ করুন",
@@ -329,6 +352,12 @@ public class BartalapToolsActivity extends BaseFragment {
                 v -> presentFragment(new BartalapToolsActivity(MODE_CROSSPOST)), null));
         content.addView(itemCard(ctx, "📈 চ্যানেল ট্র্যাকার", "নিজের বা প্রতিযোগীর পাবলিক চ্যানেলের সাবস্ক্রাইবার কত বাড়ছে দেখুন",
                 v -> presentFragment(new BartalapToolsActivity(MODE_TRACKER)), null));
+        content.addView(itemCard(ctx, "🔥 পোস্ট পারফরম্যান্স ও A/B তুলনা", "কোন পোস্টে বেশি ভিউ, দুটো পোস্ট পাশাপাশি তুলনা",
+                v -> presentFragment(new BartalapToolsActivity(MODE_POSTS)), null));
+        content.addView(itemCard(ctx, "🌐 চ্যানেল থেকে ওয়েবসাইট", "চ্যানেলের পোস্ট দিয়ে এক চাপে ওয়েবসাইট (Netlify-তে আপলোড করুন)",
+                v -> presentFragment(new BartalapToolsActivity(MODE_WEBSITE)), null));
+        content.addView(itemCard(ctx, "🗂 মিডিয়া খুঁজুন", "সব চ্যাটের ছবি, ভিডিও, ফাইল, গান, ভয়েস আলাদা আলাদা",
+                v -> presentFragment(new BartalapToolsActivity(MODE_MEDIA)), null));
         content.addView(itemCard(ctx, "📊 পোস্ট করার সেরা সময়", "আপনার Telegram চ্যানেলে কোন সময় আর কোন দিন পোস্ট করলে বেশি ভিউ আসে",
                 v -> presentFragment(new BartalapToolsActivity(MODE_BEST_TIME)), null));
         content.addView(itemCard(ctx, "🔗 লিংক ভল্ট", "সব চ্যাটে আসা লিংক এক জায়গায়: YouTube, Drive, Facebook, Telegram",
@@ -345,6 +374,8 @@ public class BartalapToolsActivity extends BaseFragment {
                 v -> presentFragment(new BartalapToolsActivity(MODE_LEDGER)), null));
         content.addView(itemCard(ctx, "🔎 TrxID ডিটেক্টর", "bKash/Nagad/Rocket SMS পেস্ট করলে TrxID, টাকা, নাম্বার বের করে দেবে",
                 v -> presentFragment(new BartalapToolsActivity(MODE_TRX)), null));
+        content.addView(itemCard(ctx, "💾 ব্যাকআপ / রিস্টোর", "নোট, বাকির খাতা, টেমপ্লেট সব Saved Messages-এ ব্যাকআপ রাখুন",
+                v -> backupDialog(ctx), null));
     }
 
     // ---------------------------------------------------------------- banglish
@@ -1543,4 +1574,534 @@ public class BartalapToolsActivity extends BaseFragment {
         }));
     }
 
+
+    // ================================================================ batch 8
+
+    private String uPkg = "";
+    private String uChat = "";
+    private String unifiedFilter = "";
+
+    public static BartalapToolsActivity unifiedChat(String pkg, String chat) {
+        BartalapToolsActivity f = new BartalapToolsActivity(MODE_UNIFIED_CHAT);
+        f.uPkg = pkg;
+        f.uChat = chat;
+        return f;
+    }
+
+    private static String clock(long ms) {
+        return new SimpleDateFormat("dd/MM hh:mm a", Locale.US).format(new Date(ms));
+    }
+
+    // ---------------------------------------------------------------- unified inbox (WhatsApp, Messenger …)
+
+    private void buildUnified(Context ctx) {
+        boolean granted = BartalapNotificationListener.isPermissionGranted(ctx);
+        LinearLayout status = new LinearLayout(ctx);
+        status.setOrientation(LinearLayout.VERTICAL);
+        status.setPadding(dp(16), dp(14), dp(16), dp(14));
+        status.setBackground(card(granted ? 0xFF16A34A : 0xFFDC2626));
+        status.addView(text(ctx, granted ? "✅ চালু আছে" : "⚠️ অনুমতি দরকার", 17, true, 0xFFFFFFFF));
+        status.addView(text(ctx, granted
+                ? "WhatsApp, Messenger, Instagram, IMO-র নতুন মেসেজ এখানে জমা হবে। কেউ ডিলিট করলেও কপি থাকবে।"
+                : "নিচের বাটনে চাপ দিয়ে লিস্ট থেকে Bartalap চালু করুন (Notification access)।", 13, false, 0xEEFFFFFF));
+        status.setLayoutParams(lp(8));
+        content.addView(status);
+        if (!granted) {
+            Button allow = button(ctx, "🔓 অনুমতি দিন", v -> {
+                try {
+                    if (getParentActivity() != null) getParentActivity().startActivity(BartalapNotificationListener.permissionIntent());
+                } catch (Exception e) {
+                    toast("Settings → Notifications → Notification access খুলুন");
+                }
+            });
+            allow.setLayoutParams(lp(10));
+            content.addView(allow);
+        }
+        TextView note = text(ctx, "নোট: শুধু নোটিফিকেশনে যে মেসেজ আসে সেটাই দেখা যাবে। সব তথ্য শুধু আপনার ফোনেই থাকে।", 12.5f, false, grayColor());
+        note.setLayoutParams(lp(8));
+        content.addView(note);
+
+        // Filter chips
+        android.widget.HorizontalScrollView hs = new android.widget.HorizontalScrollView(ctx);
+        hs.setHorizontalScrollBarEnabled(false);
+        LinearLayout chips = new LinearLayout(ctx);
+        String[][] filters = {{"", "সব"}, {"com.whatsapp", "WhatsApp"}, {"com.facebook.orca", "Messenger"}, {"com.instagram.android", "Instagram"}, {"com.imo.android.imoim", "IMO"}, {"deleted", "🗑 ডিলিট করা"}};
+        for (String[] f : filters) {
+            Button b = button(ctx, f[1], v -> {
+                unifiedFilter = f[0];
+                build(ctx);
+            });
+            b.setAlpha(f[0].equals(unifiedFilter) ? 1f : 0.5f);
+            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            p.rightMargin = dp(8);
+            chips.addView(b, p);
+        }
+        hs.addView(chips);
+        hs.setLayoutParams(lp(10));
+        content.addView(hs);
+
+        JSONArray all = BartalapNotificationListener.load(ctx);
+        if ("deleted".equals(unifiedFilter)) {
+            int shown = 0;
+            for (int i = all.length() - 1; i >= 0 && shown < 200; i--) {
+                JSONObject o = all.optJSONObject(i);
+                if (o == null || !o.optBoolean("deleted")) continue;
+                final String pkg = o.optString("pkg"), chat = o.optString("chat");
+                content.addView(itemCard(ctx, "🗑 " + o.optString("sender") + " · " + BartalapNotificationListener.appName(pkg),
+                        o.optString("text") + "\n" + clock(o.optLong("time")),
+                        v -> presentFragment(unifiedChat(pkg, chat)), null));
+                shown++;
+            }
+            if (shown == 0) content.addView(emptyText(ctx, "কোনো ডিলিট করা মেসেজ ধরা পড়েনি।"));
+            return;
+        }
+        // Group by conversation, newest first
+        java.util.LinkedHashMap<String, JSONObject> latest = new java.util.LinkedHashMap<>();
+        java.util.HashMap<String, Integer> counts = new java.util.HashMap<>();
+        for (int i = all.length() - 1; i >= 0; i--) {
+            JSONObject o = all.optJSONObject(i);
+            if (o == null) continue;
+            String pkg = o.optString("pkg");
+            if (!unifiedFilter.isEmpty() && !pkg.startsWith(unifiedFilter)) continue;
+            String key = BartalapNotificationListener.convKey(pkg, o.optString("chat"));
+            if (!latest.containsKey(key)) latest.put(key, o);
+            Integer c = counts.get(key);
+            counts.put(key, c == null ? 1 : c + 1);
+        }
+        if (latest.isEmpty()) {
+            content.addView(emptyText(ctx, granted ? "এখনো কোনো মেসেজ আসেনি। নতুন মেসেজ এলে এখানে দেখাবে।" : "অনুমতি দিলে এখানে মেসেজ দেখাবে।"));
+            return;
+        }
+        for (java.util.Map.Entry<String, JSONObject> e : latest.entrySet()) {
+            JSONObject o = e.getValue();
+            final String pkg = o.optString("pkg"), chat = o.optString("chat");
+            String sub = (o.optBoolean("deleted") ? "🗑 " : "") + shorten(o.optString("text"), 90) + "\n" + clock(o.optLong("time")) + " · " + counts.get(e.getKey()) + " টি মেসেজ";
+            content.addView(itemCard(ctx, "💬 " + chat + "  ·  " + BartalapNotificationListener.appName(pkg), sub,
+                    v -> presentFragment(unifiedChat(pkg, chat)), null));
+        }
+        Button clear = button(ctx, "🧹 সব মুছে ফেলুন", v -> confirm("সব মুছবেন?", "ইউনিফাইড ইনবক্সের সব জমা মেসেজ মুছে যাবে।", () -> {
+            BartalapNotificationListener.clearAll(ctx);
+            build(ctx);
+        }));
+        clear.setLayoutParams(lp(18));
+        content.addView(clear);
+    }
+
+    private void buildUnifiedChat(Context ctx) {
+        JSONArray all = BartalapNotificationListener.load(ctx);
+        TextView head = text(ctx, "💬 " + uChat + " · " + BartalapNotificationListener.appName(uPkg), 17, true, textColor());
+        head.setLayoutParams(lp(6));
+        content.addView(head);
+        for (int i = 0; i < all.length(); i++) {
+            JSONObject o = all.optJSONObject(i);
+            if (o == null || !uPkg.equals(o.optString("pkg")) || !uChat.equals(o.optString("chat"))) continue;
+            boolean out = o.optBoolean("out");
+            TextView bubble = text(ctx, (out ? "" : o.optString("sender") + "\n") + o.optString("text")
+                    + (o.optBoolean("deleted") ? "\n🗑 পাঠানো ব্যক্তি এটা ডিলিট করেছে" : "") + "\n" + clock(o.optLong("time")), 15, false,
+                    out ? 0xFFFFFFFF : textColor());
+            bubble.setTextIsSelectable(true);
+            bubble.setPadding(dp(14), dp(10), dp(14), dp(10));
+            bubble.setBackground(card(out ? accent() : (o.optBoolean("deleted") ? 0x33DC2626 : cardColor())));
+            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            p.topMargin = dp(8);
+            p.gravity = out ? Gravity.END : Gravity.START;
+            content.addView(bubble, p);
+        }
+        boolean canReply = BartalapNotificationListener.canReply(uPkg, uChat);
+        EditText in = input(ctx, canReply ? "উত্তর লিখুন (বাংলিশও চলবে)…" : "রিপ্লাই করতে নতুন মেসেজ আসার অপেক্ষা করুন", true);
+        in.setLayoutParams(lp(16));
+        content.addView(in);
+        Button send = button(ctx, canReply ? "📤 " + BartalapNotificationListener.appName(uPkg) + "-এ উত্তর পাঠান" : "📱 " + BartalapNotificationListener.appName(uPkg) + " খুলুন", v -> {
+            if (BartalapNotificationListener.canReply(uPkg, uChat)) {
+                String t = in.getText().toString().trim();
+                if (t.isEmpty()) return;
+                boolean latin = false;
+                for (int i = 0; i < t.length(); i++) {
+                    char c = t.charAt(i);
+                    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) { latin = true; break; }
+                }
+                if (latin && prefs().getBoolean("unified_banglish", false)) t = BanglishConverter.convert(t);
+                if (BartalapNotificationListener.reply(ctx, uPkg, uChat, t)) {
+                    toast("পাঠানো হয়েছে ✅");
+                    build(ctx);
+                } else {
+                    toast("পাঠানো যায়নি, অ্যাপ খুলে উত্তর দিন");
+                }
+            } else {
+                try {
+                    android.content.Intent li = ctx.getPackageManager().getLaunchIntentForPackage(uPkg);
+                    if (li != null && getParentActivity() != null) getParentActivity().startActivity(li);
+                } catch (Exception ignored) {
+                }
+            }
+        });
+        send.setLayoutParams(lp(8));
+        content.addView(send);
+        boolean bn = prefs().getBoolean("unified_banglish", false);
+        View bnToggle = itemCard(ctx, "⌨️ বাংলিশ লিখলে বাংলায় পাঠাবে: " + (bn ? "চালু" : "বন্ধ"), null, v -> {
+            prefs().edit().putBoolean("unified_banglish", !prefs().getBoolean("unified_banglish", false)).apply();
+            build(ctx);
+        }, null);
+        content.addView(bnToggle);
+    }
+
+    // ---------------------------------------------------------------- ghost read toggle (used on home)
+
+    private View ghostCard(Context ctx) {
+        boolean on = org.telegram.messenger.NayoGramFeatures.isGhostModeEnabled();
+        return itemCard(ctx, "👻 সিন না দিয়ে পড়া: " + (on ? "চালু ✅" : "বন্ধ"),
+                "চালু থাকলে প্রাইভেট চ্যাটে মেসেজ পড়লেও অন্যজন ব্লু টিক/Seen দেখবে না, আর আপনার typing… দেখাবে না। চাপ দিয়ে চালু/বন্ধ করুন",
+                v -> {
+                    org.telegram.messenger.NayoGramFeatures.setGhostModeEnabled(!org.telegram.messenger.NayoGramFeatures.isGhostModeEnabled());
+                    toast(org.telegram.messenger.NayoGramFeatures.isGhostModeEnabled() ? "সিন না দিয়ে পড়া চালু ✅" : "বন্ধ হয়েছে");
+                    build(ctx);
+                }, null);
+    }
+
+    // ---------------------------------------------------------------- priority inbox
+
+    private static final String[] PRIORITY_WORDS = {"bkash", "বিকাশ", "nagad", "নগদ", "rocket", "trxid", "txnid", "টাকা", "taka", "tk",
+            "payment", "পেমেন্ট", "order", "অর্ডার", "price", "দাম", "urgent", "জরুরি", "কিনব", "কিনতে", "buy", "renew", "রিনিউ", "subscription", "send money"};
+
+    private int priorityScore(MessageObject m, TLRPC.User u, TLRPC.Dialog d) {
+        int score = 0;
+        String t = m.messageText == null ? "" : m.messageText.toString().toLowerCase(Locale.ROOT);
+        for (String w : PRIORITY_WORDS) if (t.contains(w)) score += 3;
+        if (u != null && u.contact) score += 2;
+        if (d.unread_count > 0) score += Math.min(4, d.unread_count);
+        long age = System.currentTimeMillis() / 1000L - m.messageOwner.date;
+        if (age < 3600) score += 3;
+        else if (age < 86400) score += 1;
+        return score;
+    }
+
+    private void buildPriority(Context ctx) {
+        TextView hint = text(ctx, "পেমেন্ট, অর্ডার, টাকা, জরুরি ধরনের কথা আর পরিচিতদের মেসেজ উপরে। শুধু যাদের উত্তর বাকি তারা।", 13, false, grayColor());
+        hint.setLayoutParams(lp(8));
+        content.addView(hint);
+        MessagesController mc = MessagesController.getInstance(currentAccount);
+        long self = UserConfig.getInstance(currentAccount).getClientUserId();
+        ArrayList<Object[]> list = new ArrayList<>();
+        for (TLRPC.Dialog d : new ArrayList<>(mc.getAllDialogs())) {
+            if (d == null || !DialogObject.isUserDialog(d.id) || d.id == self || d.id == 777000L) continue;
+            TLRPC.User u = mc.getUser(d.id);
+            if (u == null || u.bot) continue;
+            ArrayList<MessageObject> msgs = mc.dialogMessage.get(d.id);
+            if (msgs == null || msgs.isEmpty() || msgs.get(0) == null || msgs.get(0).messageOwner == null || msgs.get(0).isOut()) continue;
+            int sc = priorityScore(msgs.get(0), u, d);
+            if (sc >= 3) list.add(new Object[]{sc, msgs.get(0)});
+        }
+        Collections.sort(list, (a, b) -> Integer.compare((Integer) b[0], (Integer) a[0]));
+        if (list.isEmpty()) {
+            content.addView(emptyText(ctx, "এই মুহূর্তে জরুরি কিছু নেই 🎉"));
+            return;
+        }
+        for (Object[] row : list) {
+            MessageObject m = (MessageObject) row[1];
+            int sc = (Integer) row[0];
+            final long did = m.getDialogId();
+            String badge = sc >= 9 ? "🔴 খুব জরুরি" : sc >= 6 ? "🟠 জরুরি" : "🟡 দেখুন";
+            content.addView(itemCard(ctx, badge + "  ·  " + dialogName(did), shorten(m.messageText, 100) + "\n" + timeAgo(m.messageOwner.date),
+                    v -> openChat(did, 0), null));
+        }
+    }
+
+    // ---------------------------------------------------------------- post performance + A/B compare
+
+    private void buildPosts(Context ctx) {
+        TextView intro = text(ctx, "চ্যানেলের শেষ ১০০টা পোস্ট ভিউ অনুযায়ী সাজানো। দুটো পোস্টে চাপ দিলে A/B তুলনা দেখাবে।", 14, false, grayColor());
+        intro.setLayoutParams(lp(8));
+        content.addView(intro);
+        Button pick = button(ctx, "📢 চ্যানেল বেছে নিন", v -> pickChannel(ctx, (id, name) -> loadPosts(ctx, id, name)));
+        pick.setLayoutParams(lp(10));
+        content.addView(pick);
+        statsBox = new LinearLayout(ctx);
+        statsBox.setOrientation(LinearLayout.VERTICAL);
+        statsBox.setLayoutParams(lp(10));
+        content.addView(statsBox);
+    }
+
+    private interface ChannelPicked {
+        void onPicked(long dialogId, String name);
+    }
+
+    private void pickChannel(Context ctx, ChannelPicked cb) {
+        if (getParentActivity() == null) return;
+        MessagesController mc = MessagesController.getInstance(currentAccount);
+        ArrayList<Long> ids = new ArrayList<>();
+        ArrayList<CharSequence> names = new ArrayList<>();
+        for (TLRPC.Dialog d : new ArrayList<>(mc.getAllDialogs())) {
+            if (d == null || !DialogObject.isChatDialog(d.id)) continue;
+            TLRPC.Chat c = mc.getChat(-d.id);
+            if (c == null || !ChatObject.isChannelAndNotMegaGroup(c)) continue;
+            ids.add(d.id);
+            names.add("📢 " + c.title);
+        }
+        if (ids.isEmpty()) {
+            toast("কোনো চ্যানেল পাওয়া যায়নি");
+            return;
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
+        b.setTitle("কোন চ্যানেল?");
+        b.setItems(names.toArray(new CharSequence[0]), (dlg, which) -> cb.onPicked(ids.get(which), names.get(which).toString()));
+        showDialog(b.create());
+    }
+
+    private final ArrayList<TLRPC.Message> abPick = new ArrayList<>();
+
+    private void loadPosts(Context ctx, long dialogId, String name) {
+        statsBox.removeAllViews();
+        abPick.clear();
+        statsBox.addView(emptyText(ctx, "লোড হচ্ছে… ⏳"));
+        TLRPC.TL_messages_getHistory req = new TLRPC.TL_messages_getHistory();
+        req.peer = MessagesController.getInstance(currentAccount).getInputPeer(dialogId);
+        req.limit = 100;
+        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+            statsBox.removeAllViews();
+            if (!(response instanceof TLRPC.messages_Messages)) {
+                statsBox.addView(emptyText(ctx, "লোড করা যায়নি।"));
+                return;
+            }
+            ArrayList<TLRPC.Message> posts = new ArrayList<>();
+            for (TLRPC.Message m : ((TLRPC.messages_Messages) response).messages) {
+                if (m != null && m.views > 0) posts.add(m);
+            }
+            Collections.sort(posts, (a, b) -> Integer.compare(b.views, a.views));
+            if (posts.isEmpty()) {
+                statsBox.addView(emptyText(ctx, "ভিউসহ কোনো পোস্ট নেই।"));
+                return;
+            }
+            long sum = 0;
+            for (TLRPC.Message m : posts) sum += m.views;
+            long avg = sum / posts.size();
+            statsBox.addView(text(ctx, name + " · গড় ভিউ " + avg, 15, true, accent()));
+            int rank = 1;
+            for (TLRPC.Message m : posts) {
+                final TLRPC.Message post = m;
+                String tag = m.views >= avg * 1.5 ? "🔥 " : m.views < avg * 0.6 ? "🧊 " : "";
+                String body = (m.message == null || m.message.isEmpty()) ? "(মিডিয়া পোস্ট)" : shorten(m.message, 110);
+                statsBox.addView(itemCard(ctx, "#" + rank + "  " + tag + "👁 " + m.views + (m.forwards > 0 ? "  ↗️ " + m.forwards : ""),
+                        body + "\n" + clock(m.date * 1000L), v -> {
+                            abPick.add(post);
+                            if (abPick.size() == 1) {
+                                toast("A বেছে নেওয়া হলো, এবার B পোস্টে চাপ দিন");
+                            } else {
+                                showAb(abPick.get(0), abPick.get(1), avg);
+                                abPick.clear();
+                            }
+                        }, null));
+                rank++;
+            }
+        }));
+    }
+
+    private void showAb(TLRPC.Message a, TLRPC.Message b, long avg) {
+        if (getParentActivity() == null) return;
+        TLRPC.Message win = a.views >= b.views ? a : b;
+        double diff = Math.abs(a.views - b.views) * 100.0 / Math.max(1, Math.min(a.views, b.views));
+        java.util.Calendar ca = java.util.Calendar.getInstance();
+        ca.setTimeInMillis(a.date * 1000L);
+        java.util.Calendar cb = java.util.Calendar.getInstance();
+        cb.setTimeInMillis(b.date * 1000L);
+        String msg = "A: 👁 " + a.views + " · " + hourLabel(ca.get(java.util.Calendar.HOUR_OF_DAY)) + "\n" + shorten(a.message, 80)
+                + "\n\nB: 👁 " + b.views + " · " + hourLabel(cb.get(java.util.Calendar.HOUR_OF_DAY)) + "\n" + shorten(b.message, 80)
+                + "\n\n🏆 জয়ী: " + (win == a ? "A" : "B") + " (" + String.format(Locale.US, "%.0f", diff) + "% বেশি ভিউ)\nচ্যানেলের গড়: " + avg
+                + "\n\nটিপস: জয়ী পোস্টের ধরন, লেখার স্টাইল আর সময় পরের পোস্টে ব্যবহার করুন।";
+        AlertDialog.Builder bd = new AlertDialog.Builder(getParentActivity());
+        bd.setTitle("📊 A/B তুলনা");
+        bd.setMessage(msg);
+        bd.setPositiveButton("ঠিক আছে", null);
+        showDialog(bd.create());
+    }
+
+    // ---------------------------------------------------------------- channel -> website
+
+    private void buildWebsite(Context ctx) {
+        TextView intro = text(ctx, "আপনার চ্যানেলের শেষ ১০০টা লেখা-পোস্ট দিয়ে একটা সুন্দর ওয়েবসাইট (HTML ফাইল) বানাবে। ফাইলটা Netlify-তে আপলোড করলেই সাইট লাইভ।", 14, false, grayColor());
+        intro.setLayoutParams(lp(8));
+        content.addView(intro);
+        Button pick = button(ctx, "📢 চ্যানেল বেছে নিন ও ওয়েবসাইট বানান", v -> pickChannel(ctx, (id, name) -> makeWebsite(ctx, id, name)));
+        pick.setLayoutParams(lp(10));
+        content.addView(pick);
+        TextView steps = text(ctx, "Netlify-তে লাইভ করার ধাপ:\n১. app.netlify.com/drop খুলুন\n২. বানানো index.html ফাইলটা ড্রপ করুন\n৩. লিংক পেয়ে যাবেন", 13, false, grayColor());
+        steps.setLayoutParams(lp(14));
+        content.addView(steps);
+    }
+
+    private static String esc(String s) {
+        if (s == null) return "";
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+    }
+
+    private static String linkify(String escaped) {
+        return escaped.replaceAll("(https?://[^\\s<]+)", "<a href=\"$1\" target=\"_blank\" rel=\"noopener\">$1</a>").replace("\n", "<br>");
+    }
+
+    private void makeWebsite(Context ctx, long dialogId, String name) {
+        toast("পোস্ট আনা হচ্ছে… ⏳");
+        TLRPC.Chat chat = MessagesController.getInstance(currentAccount).getChat(-dialogId);
+        String username = chat != null && ChatObject.getPublicUsername(chat) != null ? ChatObject.getPublicUsername(chat) : "";
+        TLRPC.TL_messages_getHistory req = new TLRPC.TL_messages_getHistory();
+        req.peer = MessagesController.getInstance(currentAccount).getInputPeer(dialogId);
+        req.limit = 100;
+        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+            if (!(response instanceof TLRPC.messages_Messages)) {
+                toast("পোস্ট আনা যায়নি");
+                return;
+            }
+            String title = name.replace("📢 ", "");
+            StringBuilder h = new StringBuilder();
+            h.append("<!DOCTYPE html><html lang=\"bn\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">")
+                    .append("<title>").append(esc(title)).append("</title>")
+                    .append("<link href=\"https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap\" rel=\"stylesheet\">")
+                    .append("<style>body{margin:0;font-family:'Hind Siliguri',sans-serif;background:#f4f6fb;color:#1e293b}")
+                    .append("header{background:linear-gradient(135deg,#00B4DB,#6A3DE8);color:#fff;padding:42px 20px;text-align:center}")
+                    .append("header h1{margin:0;font-size:30px}header a{display:inline-block;margin-top:14px;background:#fff;color:#6A3DE8;padding:10px 22px;border-radius:30px;text-decoration:none;font-weight:700}")
+                    .append("main{max-width:760px;margin:0 auto;padding:18px}article{background:#fff;border-radius:16px;padding:18px 20px;margin:14px 0;box-shadow:0 2px 12px rgba(0,0,0,.06);line-height:1.7;font-size:17px}")
+                    .append("article time{display:block;color:#94a3b8;font-size:13px;margin-top:10px}article a{color:#6A3DE8;word-break:break-all}")
+                    .append("footer{text-align:center;color:#94a3b8;padding:30px;font-size:13px}</style></head><body>")
+                    .append("<header><h1>").append(esc(title)).append("</h1>");
+            if (!username.isEmpty()) h.append("<a href=\"https://t.me/").append(esc(username)).append("\">Telegram-এ জয়েন করুন</a>");
+            h.append("</header><main>");
+            int count = 0;
+            for (TLRPC.Message m : ((TLRPC.messages_Messages) response).messages) {
+                if (m == null || m.message == null || m.message.trim().isEmpty()) continue;
+                h.append("<article>").append(linkify(esc(m.message))).append("<time>")
+                        .append(new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.US).format(new Date(m.date * 1000L)))
+                        .append(m.views > 0 ? " · 👁 " + m.views : "").append("</time></article>");
+                count++;
+            }
+            h.append("</main><footer>Made with Bartalap</footer></body></html>");
+            if (count == 0) {
+                toast("লেখা-পোস্ট পাওয়া যায়নি");
+                return;
+            }
+            try {
+                java.io.File dir = new java.io.File(ctx.getExternalFilesDir(null), "website");
+                dir.mkdirs();
+                java.io.File f = new java.io.File(dir, "index.html");
+                try (java.io.FileOutputStream out = new java.io.FileOutputStream(f)) {
+                    out.write(h.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
+                android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(ctx, ApplicationLoader.getApplicationId() + ".provider", f);
+                android.content.Intent share = new android.content.Intent(android.content.Intent.ACTION_SEND);
+                share.setType("text/html");
+                share.putExtra(android.content.Intent.EXTRA_STREAM, uri);
+                share.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if (getParentActivity() != null) {
+                    getParentActivity().startActivity(android.content.Intent.createChooser(share, count + " পোস্টের ওয়েবসাইট শেয়ার/সেভ করুন"));
+                }
+            } catch (Throwable t) {
+                toast("ফাইল সেভ করা যায়নি: " + t.getMessage());
+            }
+        }));
+    }
+
+    // ---------------------------------------------------------------- media finder (sorted by type)
+
+    private void buildMedia(Context ctx) {
+        TextView intro = text(ctx, "সব চ্যাটে আসা ফাইল ধরন অনুযায়ী খুঁজুন। চাপ দিলে সেই মেসেজে নিয়ে যাবে।", 14, false, grayColor());
+        intro.setLayoutParams(lp(8));
+        content.addView(intro);
+        LinearLayout results = new LinearLayout(ctx);
+        results.setOrientation(LinearLayout.VERTICAL);
+        String[] labels = {"🖼 ছবি", "🎬 ভিডিও", "📄 ডকুমেন্ট/ফাইল", "🎵 অডিও/গান", "🎙 ভয়েস মেসেজ", "🧾 পেমেন্ট/রসিদ (লেখা)"};
+        for (int i = 0; i < labels.length; i++) {
+            final int type = i;
+            final String label = labels[i];
+            View c = itemCard(ctx, label, null, v -> searchMedia(ctx, type, label, results), null);
+            content.addView(c);
+        }
+        results.setLayoutParams(lp(12));
+        content.addView(results);
+    }
+
+    private void searchMedia(Context ctx, int type, String label, LinearLayout results) {
+        results.removeAllViews();
+        results.addView(emptyText(ctx, label + " খোঁজা হচ্ছে… ⏳"));
+        TLRPC.TL_messages_searchGlobal req = new TLRPC.TL_messages_searchGlobal();
+        req.q = "";
+        switch (type) {
+            case 0: req.filter = new TLRPC.TL_inputMessagesFilterPhotos(); break;
+            case 1: req.filter = new TLRPC.TL_inputMessagesFilterVideo(); break;
+            case 2: req.filter = new TLRPC.TL_inputMessagesFilterDocument(); break;
+            case 3: req.filter = new TLRPC.TL_inputMessagesFilterMusic(); break;
+            case 4: req.filter = new TLRPC.TL_inputMessagesFilterVoice(); break;
+            default:
+                req.filter = new TLRPC.TL_inputMessagesFilterEmpty();
+                req.q = "TrxID";
+                break;
+        }
+        req.limit = 60;
+        req.offset_peer = new TLRPC.TL_inputPeerEmpty();
+        ConnectionsManager.getInstance(currentAccount).sendRequestTyped(req, (res, err) -> AndroidUtilities.runOnUIThread(() -> {
+            results.removeAllViews();
+            if (res == null || res.messages.isEmpty()) {
+                results.addView(emptyText(ctx, "কিছু পাওয়া যায়নি।"));
+                return;
+            }
+            MessagesController.getInstance(currentAccount).putUsers(res.users, false);
+            MessagesController.getInstance(currentAccount).putChats(res.chats, false);
+            results.addView(text(ctx, label + ": " + res.messages.size() + " টি", 14, true, accent()));
+            for (TLRPC.Message m : res.messages) {
+                if (m == null) continue;
+                final long did = MessageObject.getPeerId(m.peer_id);
+                final int mid = m.id;
+                String desc = m.message == null || m.message.isEmpty() ? "" : shorten(m.message, 80);
+                if (m.media != null && m.media.document != null) {
+                    String fn = org.telegram.messenger.FileLoader.getDocumentFileName(m.media.document);
+                    if (fn != null && !fn.isEmpty()) desc = "📎 " + fn + (desc.isEmpty() ? "" : "\n" + desc);
+                }
+                results.addView(itemCard(ctx, dialogName(did) + "  ·  " + timeAgo(m.date), desc.isEmpty() ? null : desc,
+                        v -> openChat(did, mid), null));
+            }
+        }));
+    }
+
+    // ---------------------------------------------------------------- backup / restore of Bartalap data
+
+    private static final String[] BACKUP_KEYS = {KEY_TEMPLATES, KEY_NOTES, KEY_LEDGER, "saved_keywords", "tracked_channels"};
+
+    private void backupDialog(Context ctx) {
+        if (getParentActivity() == null) return;
+        AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
+        b.setTitle("💾 ব্যাকআপ / রিস্টোর");
+        b.setItems(new CharSequence[]{"📤 Saved Messages-এ ব্যাকআপ পাঠান", "📋 ব্যাকআপ কপি করুন", "📥 কপি করা ব্যাকআপ থেকে রিস্টোর"}, (d, which) -> {
+            JSONObject all = new JSONObject();
+            try {
+                for (String k : BACKUP_KEYS) all.put(k, loadArray(k));
+            } catch (Exception ignored) {
+            }
+            String data = "#BartalapBackup\n" + all.toString();
+            if (which == 0) {
+                long self = UserConfig.getInstance(currentAccount).getClientUserId();
+                for (int i = 0; i < data.length(); i += 3900) {
+                    String part = data.substring(i, Math.min(data.length(), i + 3900));
+                    org.telegram.messenger.SendMessagesHelper.getInstance(currentAccount)
+                            .sendMessage(org.telegram.messenger.SendMessagesHelper.SendMessageParams.of(part, self));
+                }
+                toast("Saved Messages-এ ব্যাকআপ পাঠানো হয়েছে ✅");
+            } else if (which == 1) {
+                copy(data);
+            } else {
+                try {
+                    ClipboardManager cm = (ClipboardManager) ApplicationLoader.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                    CharSequence clip = cm.getPrimaryClip() != null && cm.getPrimaryClip().getItemCount() > 0 ? cm.getPrimaryClip().getItemAt(0).getText() : null;
+                    String s = clip == null ? "" : clip.toString().replace("#BartalapBackup", "").trim();
+                    JSONObject o = new JSONObject(s);
+                    for (String k : BACKUP_KEYS) {
+                        JSONArray arr = o.optJSONArray(k);
+                        if (arr != null) saveArray(k, arr);
+                    }
+                    toast("রিস্টোর হয়েছে ✅");
+                    build(ctx);
+                } catch (Exception e) {
+                    toast("ক্লিপবোর্ডে সঠিক ব্যাকআপ নেই। আগে ব্যাকআপ লেখাটা পুরো কপি করুন।");
+                }
+            }
+        });
+        showDialog(b.create());
+    }
+
+    // backup card is added at the end of home
 }

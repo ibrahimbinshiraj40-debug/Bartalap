@@ -47,6 +47,28 @@ public final class AiClient {
 
     /** Sends one prompt and returns the model's text answer. Throws with a readable message on failure. */
     public static String ask(String system, String prompt) throws Exception {
+        return ask(system, prompt, null);
+    }
+
+    /** Reads an image file, shrinks it and returns base64 JPEG (for AI vision). */
+    public static String imageToBase64(String path) throws Exception {
+        android.graphics.BitmapFactory.Options o = new android.graphics.BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        android.graphics.BitmapFactory.decodeFile(path, o);
+        int sample = 1;
+        while (Math.max(o.outWidth, o.outHeight) / sample > 1600) sample *= 2;
+        android.graphics.BitmapFactory.Options o2 = new android.graphics.BitmapFactory.Options();
+        o2.inSampleSize = sample;
+        android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeFile(path, o2);
+        if (bmp == null) throw new Exception("ছবি খোলা যায়নি");
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 82, out);
+        bmp.recycle();
+        return android.util.Base64.encodeToString(out.toByteArray(), android.util.Base64.NO_WRAP);
+    }
+
+    /** imageBase64Jpeg may be null for text-only questions. */
+    public static String ask(String system, String prompt, String imageBase64Jpeg) throws Exception {
         SharedPreferences p = prefs();
         String key = p.getString(KEY_API_KEY, "").trim();
         if (key.isEmpty()) throw new Exception("AI API Key দেওয়া হয়নি");
@@ -63,12 +85,28 @@ public final class AiClient {
             url = base.endsWith("/chat/completions") ? base : base + "/chat/completions";
             JSONArray msgs = new JSONArray();
             msgs.put(new JSONObject().put("role", "system").put("content", system));
-            msgs.put(new JSONObject().put("role", "user").put("content", prompt));
+            if (imageBase64Jpeg == null) {
+                msgs.put(new JSONObject().put("role", "user").put("content", prompt));
+            } else {
+                JSONArray parts = new JSONArray();
+                parts.put(new JSONObject().put("type", "text").put("text", prompt));
+                parts.put(new JSONObject().put("type", "image_url").put("image_url",
+                        new JSONObject().put("url", "data:image/jpeg;base64," + imageBase64Jpeg)));
+                msgs.put(new JSONObject().put("role", "user").put("content", parts));
+            }
             body.put("model", model).put("messages", msgs).put("max_tokens", 800);
         } else {
             url = base.endsWith("/v1/messages") ? base : (base.endsWith("/v1") ? base + "/messages" : base + "/v1/messages");
             JSONArray msgs = new JSONArray();
-            msgs.put(new JSONObject().put("role", "user").put("content", prompt));
+            if (imageBase64Jpeg == null) {
+                msgs.put(new JSONObject().put("role", "user").put("content", prompt));
+            } else {
+                JSONArray parts = new JSONArray();
+                parts.put(new JSONObject().put("type", "image").put("source", new JSONObject()
+                        .put("type", "base64").put("media_type", "image/jpeg").put("data", imageBase64Jpeg)));
+                parts.put(new JSONObject().put("type", "text").put("text", prompt));
+                msgs.put(new JSONObject().put("role", "user").put("content", parts));
+            }
             body.put("model", model).put("system", system).put("messages", msgs).put("max_tokens", 800);
         }
 

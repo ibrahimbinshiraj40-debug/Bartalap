@@ -98,6 +98,8 @@ public final class BartalapChatTools {
                 "🤖 AI দিয়ে উত্তর লিখুন",
                 "🧾 AI দিয়ে চ্যাটের সারাংশ",
                 "✅ AI দিয়ে কাজের লিস্ট (কে কী কথা দিয়েছে)",
+                "💳 AI দিয়ে পেমেন্ট স্ক্রিনশট পড়ুন",
+                "📜 কন্টাক্ট টাইমলাইন",
                 "📝 এই কন্টাক্টের নোট",
                 "💰 বাকির খাতায় যোগ করুন",
                 "😴 চ্যাট স্নুজ (পরে মনে করাবে)",
@@ -113,9 +115,11 @@ public final class BartalapChatTools {
                 case 3: aiReply(chat, dialogId); break;
                 case 4: aiSummary(chat, dialogId); break;
                 case 5: aiTasks(chat, dialogId); break;
-                case 6: contactNote(chat, dialogId); break;
-                case 7: addToLedger(chat, dialogId); break;
-                case 8: snooze(chat, dialogId); break;
+                case 6: paymentScreenshot(chat, dialogId); break;
+                case 7: timeline(chat, dialogId); break;
+                case 8: contactNote(chat, dialogId); break;
+                case 9: addToLedger(chat, dialogId); break;
+                case 10: snooze(chat, dialogId); break;
                 default: aiSettings(a, null); break;
             }
         });
@@ -347,6 +351,133 @@ public final class BartalapChatTools {
         String system = "From this Telegram chat, list in simple Bengali every promise, pending task, payment due and deadline. "
                 + "Format each line as: '• কে — কী করবে — কবে'. If nothing is pending, say 'কোনো বাকি কাজ নেই'.";
         runAi(chat, "✅ কাজের লিস্ট", system, t, false);
+    }
+
+    // ------------------------------------------------------------ payment screenshot (AI vision)
+
+    private static void paymentScreenshot(ChatActivity chat, long dialogId) {
+        ArrayList<MessageObject> msgs = chat.messages;
+        ArrayList<String> paths = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+        if (msgs != null) {
+            for (int i = 0; i < msgs.size() && paths.size() < 8; i++) {
+                MessageObject m = msgs.get(i);
+                if (m == null || m.messageOwner == null || !m.isPhoto()) continue;
+                java.io.File f = org.telegram.messenger.FileLoader.getInstance(chat.getCurrentAccount()).getPathToMessage(m.messageOwner);
+                if (f == null || !f.exists()) continue;
+                paths.add(f.getAbsolutePath());
+                labels.add((m.isOut() ? "আমার পাঠানো ছবি · " : "আসা ছবি · ")
+                        + new SimpleDateFormat("dd/MM hh:mm a", Locale.US).format(new Date(m.messageOwner.date * 1000L)));
+            }
+        }
+        if (paths.isEmpty()) {
+            toast("এই চ্যাটে খোলা (ডাউনলোড করা) কোনো ছবি পাওয়া যায়নি। আগে স্ক্রিনশটটা খুলে নিন।");
+            return;
+        }
+        if (!AiClient.isConfigured()) {
+            aiSettings(chat.getParentActivity(), () -> paymentScreenshot(chat, dialogId));
+            return;
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(chat.getParentActivity());
+        b.setTitle("কোন ছবিটা পড়বে?");
+        b.setItems(labels.toArray(new CharSequence[0]), (d, which) -> readPayment(chat, dialogId, paths.get(which)));
+        chat.showDialog(b.create());
+    }
+
+    private static void readPayment(ChatActivity chat, long dialogId, String path) {
+        toast("AI ছবি পড়ছে… ⏳");
+        new Thread(() -> {
+            String result;
+            boolean ok;
+            try {
+                String b64 = AiClient.imageToBase64(path);
+                result = AiClient.ask("You read Bangladeshi mobile payment screenshots (bKash, Nagad, Rocket, Upay, bank).",
+                        "এই স্ক্রিনশট থেকে বাংলায় লিখুন:\nমাধ্যম:\nটাকা:\nTrxID:\nকোন নাম্বার থেকে/কোন নাম্বারে:\nতারিখ ও সময়:\n"
+                                + "যদি এটা পেমেন্ট স্ক্রিনশট না হয় তাহলে শুধু লিখুন: 'এটা পেমেন্ট স্ক্রিনশট না'।", b64);
+                ok = true;
+            } catch (Throwable e) {
+                result = e.getMessage() == null ? "AI সমস্যা" : e.getMessage();
+                ok = false;
+            }
+            final String text = result;
+            final boolean success = ok;
+            AndroidUtilities.runOnUIThread(() -> {
+                if (chat.getParentActivity() == null) return;
+                AlertDialog.Builder b = new AlertDialog.Builder(chat.getParentActivity());
+                b.setTitle(success ? "💳 পেমেন্টের তথ্য" : "⚠️ সমস্যা");
+                b.setMessage(text);
+                b.setNegativeButton("বন্ধ", null);
+                if (success) {
+                    b.setPositiveButton("কপি", (d, w) -> copy(text));
+                    b.setNeutralButton("বাকির খাতা থেকে মিলিয়ে নিন", (d, w) -> chat.presentFragment(new BartalapToolsActivity(BartalapToolsActivity.MODE_LEDGER)));
+                }
+                chat.showDialog(b.create());
+            });
+        }).start();
+    }
+
+    // ------------------------------------------------------------ contact timeline
+
+    private static void timeline(ChatActivity chat, long dialogId) {
+        Activity a = chat.getParentActivity();
+        String name = chatName(chat, dialogId, false);
+        StringBuilder sb = new StringBuilder();
+        String note = prefs().getString("chat_note_" + dialogId, "");
+        sb.append("📝 নোট:\n").append(note.isEmpty() ? "নেই" : note).append("\n\n");
+        sb.append("💰 বাকির খাতা:\n");
+        double due = 0;
+        int dueCount = 0;
+        try {
+            JSONArray arr = new JSONArray(prefs().getString("due_ledger", "[]"));
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject o = arr.optJSONObject(i);
+                if (o == null) continue;
+                boolean match = o.optLong("dialog_id", 0) == dialogId || (!name.isEmpty() && name.equalsIgnoreCase(o.optString("name")));
+                if (!match) continue;
+                due += o.optDouble("amount", 0);
+                dueCount++;
+                sb.append("• ৳").append(o.optDouble("amount", 0)).append(" ").append(o.optString("note")).append(" (").append(o.optString("date")).append(")\n");
+            }
+        } catch (Exception ignored) {
+        }
+        if (dueCount == 0) sb.append("কিছু বাকি নেই\n");
+        else sb.append("মোট বাকি: ৳").append(due).append("\n");
+        sb.append("\n🧾 চ্যাটে পাওয়া পেমেন্ট:\n");
+        int pay = 0;
+        int links = 0;
+        int photos = 0;
+        int total = 0;
+        int first = Integer.MAX_VALUE;
+        ArrayList<MessageObject> msgs = chat.messages;
+        if (msgs != null) {
+            for (MessageObject m : msgs) {
+                if (m == null || m.messageOwner == null) continue;
+                total++;
+                first = Math.min(first, m.messageOwner.date);
+                if (m.isPhoto()) photos++;
+                String t = m.messageOwner.message;
+                if (t == null || t.isEmpty()) continue;
+                if (t.contains("http")) links++;
+                TrxDetector.Result r = TrxDetector.detect(t);
+                if (!r.trxId.isEmpty() && pay < 10) {
+                    pay++;
+                    sb.append("• ").append(r.method.isEmpty() ? "" : r.method + " ").append(r.amount.isEmpty() ? "" : "৳" + r.amount + " ")
+                            .append("TrxID ").append(r.trxId).append(" (")
+                            .append(new SimpleDateFormat("dd/MM", Locale.US).format(new Date(m.messageOwner.date * 1000L))).append(")\n");
+                }
+            }
+        }
+        if (pay == 0) sb.append("লোড করা মেসেজে কোনো TrxID নেই\n");
+        sb.append("\n📊 লোড করা ").append(total).append(" মেসেজে: ").append(photos).append(" ছবি, ").append(links).append(" লিংক");
+        if (first != Integer.MAX_VALUE) {
+            sb.append("\n📅 শুরু (লোড করা অংশে): ").append(new SimpleDateFormat("dd MMM yyyy", Locale.US).format(new Date(first * 1000L)));
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(a);
+        b.setTitle("📜 " + name);
+        b.setMessage(sb.toString());
+        b.setPositiveButton("ঠিক আছে", null);
+        b.setNeutralButton("নোট এডিট", (d, w) -> contactNote(chat, dialogId));
+        chat.showDialog(b.create());
     }
 
     public static void aiSettings(Activity a, Runnable after) {
